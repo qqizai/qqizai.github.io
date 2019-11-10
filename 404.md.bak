@@ -1,0 +1,23 @@
+---
+title: 404 Not Found
+date: 2019-11-10 16:08:51
+---
+<center>
+对不起，您所访问的页面不存在或者已删除。
+您可以<a href="https://blog.nightteam.cn>">点击此处</a>返回首页。
+</center>
+
+<blockquote class="blockquote-center">qizai</blockquote>
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>404</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="//qzonestyle.gtimg.cn/qzone/hybrid/app/404/search_children.js" charset="utf-8"></script>
+  </body>
+</html>
+-->
