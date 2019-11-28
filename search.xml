@@ -1,35 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>刚刚创建的blog</title>
-    <url>/2019/11/10/hello-world-1/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>test</category>
-        <category>分类2</category>
-      </categories>
-      <tags>
-        <tag>blog</tag>
-        <tag>标签2</tag>
-        <tag>标签3</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2019/11/09/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>crack_woff</title>
+    <title>woff字体反爬实战，10分钟就能学会(ttf字体同理)</title>
     <url>/2019/08/26/crack-woff/</url>
     <content><![CDATA[<p>声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。</p>
 <p>来继续学爬虫呀！</p>
@@ -56,15 +28,24 @@
 </blockquote>
 ]]></content>
       <categories>
-        <category>Python</category>
-        <category>爬虫</category>
         <category>反爬虫</category>
-        <category>字体反爬</category>
       </categories>
       <tags>
-        <tag>Python</tag>
-        <tag>爬虫</tag>
         <tag>反爬虫</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>欢迎来到七仔的个人博客</title>
+    <url>/2019/08/25/hello-world/</url>
+    <content><![CDATA[<p>Hexo作者:欢迎使用 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! 这是首篇文章. 更多使用请看官方文档 <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> . 如果你在使用Hexo的过程中遇到一些问题, 那么你可以在 <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">这里找到解决方案</a> 或者你可以 <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>给我提问题，我会尽快回复您的.</p>
+<h2 id="快速发布"><a href="#快速发布" class="headerlink" title="快速发布"></a>快速发布</h2><h3 id="创建一篇文章"><a href="#创建一篇文章" class="headerlink" title="创建一篇文章"></a>创建一篇文章</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+<p>创建详情请看: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>服务详情请看: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="生成静态文件"><a href="#生成静态文件" class="headerlink" title="生成静态文件"></a>生成静态文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="部署到远程站点"><a href="#部署到远程站点" class="headerlink" title="部署到远程站点"></a>部署到远程站点</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>部署详情请看: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+]]></content>
   </entry>
 </search>
