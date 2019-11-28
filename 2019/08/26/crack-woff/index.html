@@ -51,31 +51,41 @@
   };
 </script>
 
-  <meta name="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
-<meta name="keywords" content="Python，爬虫，逆向，运维">
-<meta property="og:type" content="website">
-<meta property="og:title" content="qizai">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;index.html">
+  <meta name="description" content="声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。 来继续学爬虫呀！ 前言简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？123经过分析，当前这种字体反爬机制是：通过获取指定链接的woff字体文件，然后根据html源码的数字去woff字体文件里面查找真正的数字，讲到底就是一个映射关系&#x2F;查找字典。如html源码是123，去w">
+<meta name="keywords" content="Python,爬虫,反爬虫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="crack_woff">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;08&#x2F;26&#x2F;crack-woff&#x2F;index.html">
 <meta property="og:site_name" content="qizai">
-<meta property="og:description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+<meta property="og:description" content="声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。 来继续学爬虫呀！ 前言简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？123经过分析，当前这种字体反爬机制是：通过获取指定链接的woff字体文件，然后根据html源码的数字去woff字体文件里面查找真正的数字，讲到底就是一个映射关系&#x2F;查找字典。如html源码是123，去w">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220504409.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220607308.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220646239.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220711496.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220739753.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190822133456757.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220839525.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826221219906.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-11-28T14:36:33.295Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220504409.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 
-<link rel="canonical" href="http://yoursite.com/">
+<link rel="canonical" href="http://yoursite.com/2019/08/26/crack-woff/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome: true,
-    isPost: false,
+    isHome: false,
+    isPost: true,
     isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>qizai</title>
+  <title>crack_woff | qizai</title>
   
 
 
@@ -210,151 +220,10 @@
             
 
   <div class="posts-expand">
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/10/hello-world-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qizai.png">
-      <meta itemprop="name" content="qizai">
-      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="qizai">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/10/hello-world-1/" class="post-title-link" itemprop="url">刚刚创建的blog</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2019-11-10 15:39:02 / 修改时间：15:42:04" itemprop="dateCreated datePublished" datetime="2019-11-10T15:39:02+08:00">2019-11-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/test/" itemprop="url" rel="index">
-                    <span itemprop="name">test</span>
-                  </a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/test/%E5%88%86%E7%B1%BB2/" itemprop="url" rel="index">
-                    <span itemprop="name">分类2</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
       
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
   
   
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/09/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qizai.png">
-      <meta itemprop="name" content="qizai">
-      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="qizai">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/09/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-09 22:46:57" itemprop="dateCreated datePublished" datetime="2019-11-09T22:46:57+08:00">2019-11-09</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/26/crack-woff/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -368,8 +237,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/08/26/crack-woff/" class="post-title-link" itemprop="url">crack_woff</a>
+          crack_woff
         </h1>
 
         <div class="post-meta">
@@ -429,7 +297,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。</p>
+        <p>声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。</p>
 <p>来继续学爬虫呀！</p>
 <h6 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h6><h6 id="简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？"><a href="#简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？" class="headerlink" title="简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？"></a>简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">经过分析，当前这种字体反爬机制是：通过获取指定链接的woff字体文件，然后根据html源码的数字</span><br><span class="line">去woff字体文件里面查找真正的数字，讲到底就是一个映射关系/查找字典。如html源码是123，去woff文件里面</span><br><span class="line">查找出来的是：623。好了，看到这里，你一定想说：废话讲那么多干嘛？赶紧上教程啊！！</span><br></pre></td></tr></table></figure>
 <h5 id="那先来看一下大致流程呗："><a href="#那先来看一下大致流程呗：" class="headerlink" title="那先来看一下大致流程呗："></a>那先来看一下大致流程呗：</h5><p><img src="https://img-blog.csdnimg.cn/20190826220504409.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt=""></p>
@@ -453,15 +321,35 @@
 <p><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>；<br><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a></p>
 </blockquote>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+              <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/" rel="tag"># 反爬虫</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/09/hello-world/" rel="prev" title="Hello World">
+                  Hello World <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
       </footer>
+    
   </article>
   
   
@@ -469,12 +357,10 @@
 
   </div>
 
-  
-
-
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
         </div>
           
@@ -499,6 +385,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？"><span class="nav-number">2.</span> <span class="nav-text">简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#那先来看一下大致流程呗："><span class="nav-number"></span> <span class="nav-text">那先来看一下大致流程呗：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#混淆前字体："><span class="nav-number"></span> <span class="nav-text">混淆前字体：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#混淆后的字体："><span class="nav-number"></span> <span class="nav-text">混淆后的字体：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#找了一会，发现-woff2文件和woff文件前后不一样，然后开始着手解决"><span class="nav-number">1.</span> <span class="nav-text">找了一会，发现.woff2文件和woff文件前后不一样，然后开始着手解决</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#但是本地打不开woff字体文件，需要借助的软件是fontcreator，这个你自己去找一下，很多破解的"><span class="nav-number">2.</span> <span class="nav-text">但是本地打不开woff字体文件，需要借助的软件是fontcreator，这个你自己去找一下，很多破解的</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><span class="nav-number"></span> <span class="nav-text">至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#感谢认真读完这篇教程的您"><span class="nav-number"></span> <span class="nav-text">感谢认真读完这篇教程的您</span></a></div>
       </div>
       <!--/noindex-->
 
@@ -681,6 +568,23 @@ window.addEventListener('pjax:success', () => {
 
   
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '44618db3409b8e2ef4db',
+      clientSecret: '61a79fe046604cf8e5be252a5b8a2b9384c0609f',
+      repo: 'qqizai.github.io',
+      owner: 'qqizai',
+      admin: ['qqizai'],
+      id: '7f3eb243fed52e8a3527b9637435b152',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
 
     </div>
 </body>
