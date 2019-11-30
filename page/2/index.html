@@ -438,7 +438,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h5 id="Python项目生成requirements-txt文件之pipreqs的使用"><a href="#Python项目生成requirements-txt文件之pipreqs的使用" class="headerlink" title="Python项目生成requirements.txt文件之pipreqs的使用"></a>Python项目生成requirements.txt文件之pipreqs的使用</h5><p>使用pipreqs，这个工具的好处是可以通过对项目目录的扫描，发现使用了哪些库，生成依赖清单。</p><h6 id="1、先安装这个库："><a href="#1、先安装这个库：" class="headerlink" title="1、先安装这个库："></a>1、先安装这个库：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pipreqs</span><br></pre></td></tr></table></figure><h5 id="2、使用方式"><a href="#2、使用方式" class="headerlink" title="2、使用方式"></a>2、使用方式</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在项目的根目录下使用:</span><br><span class="line"></span><br><span class="line">pipreqs ./ --encoding=utf8</span><br></pre></td></tr></table></figure>
+          <h5 id="Python项目生成requirements-txt文件之pipreqs的使用"><a href="#Python项目生成requirements-txt文件之pipreqs的使用" class="headerlink" title="Python项目生成requirements.txt文件之pipreqs的使用"></a>Python项目生成requirements.txt文件之pipreqs的使用</h5><p>使用pipreqs，这个工具的好处是可以通过对项目目录的扫描，发现使用了哪些库，生成依赖清单。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/05/19/to-requeirements/#more" rel="contents">
@@ -521,7 +521,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>首先来看一下Python临时指定安装的镜像源：</p><h6 id="命令格式："><a href="#命令格式：" class="headerlink" title="命令格式："></a>命令格式：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install 包名 -i 镜像源url</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">sudo pip3 install redis -i http://pypi.douban.com/simple</span><br></pre></td></tr></table></figure><p>可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上<code>-i xxxx</code>一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！下面来看一下呗~</p>
+          <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>首先来看一下Python临时指定安装的镜像源：</p><h6 id="命令格式："><a href="#命令格式：" class="headerlink" title="命令格式："></a>命令格式：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install 包名 -i 镜像源url</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">sudo pip3 install redis -i http://pypi.douban.com/simple</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/03/29/set-pip-proxy/#more" rel="contents">
@@ -604,7 +604,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h6 id="Tips-这里只是记录一下找镜像资源的文档，嘻嘻-……"><a href="#Tips-这里只是记录一下找镜像资源的文档，嘻嘻-……" class="headerlink" title="Tips:这里只是记录一下找镜像资源的文档，嘻嘻(^^__^^) ……"></a>Tips:这里只是记录一下找镜像资源的文档，嘻嘻(<strong>^^__^^</strong>) ……</h6><h6 id="由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu"><a href="#由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu" class="headerlink" title="由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu"></a>由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ubuntu 14.04：</span><br><span class="line">http://mirrors.aliyun.com/ubuntu-releases/14.04/</span><br><span class="line"></span><br><span class="line">ubuntu 16.04：</span><br><span class="line">http://mirrors.aliyun.com/ubuntu-releases/16.04/</span><br><span class="line"></span><br><span class="line">ubuntu 18.04：</span><br><span class="line">http://mirrors.aliyun.com/ubuntu-releases/18.04/</span><br></pre></td></tr></table></figure>
+          <h6 id="Tips-这里只是记录一下找镜像资源的文档，嘻嘻-……"><a href="#Tips-这里只是记录一下找镜像资源的文档，嘻嘻-……" class="headerlink" title="Tips:这里只是记录一下找镜像资源的文档，嘻嘻(^^__^^) ……"></a>Tips:这里只是记录一下找镜像资源的文档，嘻嘻(<strong>^^__^^</strong>) ……</h6><h6 id="由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu"><a href="#由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu" class="headerlink" title="由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu"></a>由于官网服务器在国外，下载速度奇慢，所以我们可以利用阿里云镜像下载ubuntu</h6>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/02/10/download-ubuntu/#more" rel="contents">
@@ -676,7 +676,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Hexo作者:欢迎使用 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! 这是首篇文章. 更多使用请看官方文档 <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> . 如果你在使用Hexo的过程中遇到一些问题, 那么你可以在 <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">这里找到解决方案</a> 或者你可以 <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>给我提问题，我会尽快回复您的.</p><h2 id="快速发布"><a href="#快速发布" class="headerlink" title="快速发布"></a>快速发布</h2><h3 id="创建一篇文章"><a href="#创建一篇文章" class="headerlink" title="创建一篇文章"></a>创建一篇文章</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+          <p>Hexo作者:欢迎使用 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! 这是首篇文章. 更多使用请看官方文档 <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> . 如果你在使用Hexo的过程中遇到一些问题, 那么你可以在 <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">这里找到解决方案</a> 或者你可以 <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>给我提问题，我会尽快回复您的.</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2018/07/25/hello-world/#more" rel="contents">

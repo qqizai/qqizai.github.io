@@ -51,13 +51,13 @@
   };
 </script>
 
-  <meta name="description" content="0x01、安装依赖erlang由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang1sudo apt-get install erlang-nox0x02、安装Rabbitmq先更新apt源1sudo apt-get update然后安装rabbitmq1sudo apt-get install rabbitmq-server">
+  <meta name="description" content="0x01、安装依赖erlang由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang1sudo apt-get install erlang-nox">
 <meta name="keywords" content="RabbitMQ,消息队列">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RabbitMQ Ubuntu18.0.4安装及简单使用">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;06&#x2F;19&#x2F;rabbitmq&#x2F;index.html">
 <meta property="og:site_name" content="qizai">
-<meta property="og:description" content="0x01、安装依赖erlang由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang1sudo apt-get install erlang-nox0x02、安装Rabbitmq先更新apt源1sudo apt-get update然后安装rabbitmq1sudo apt-get install rabbitmq-server">
+<meta property="og:description" content="0x01、安装依赖erlang由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang1sudo apt-get install erlang-nox">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20191104151201409.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 <meta property="og:updated_time" content="2019-11-30T08:28:09.885Z">
@@ -272,12 +272,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="0x01、安装依赖erlang"><a href="#0x01、安装依赖erlang" class="headerlink" title="0x01、安装依赖erlang"></a>0x01、安装依赖erlang</h5><p>由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install erlang-nox</span><br></pre></td></tr></table></figure><h5 id="0x02、安装Rabbitmq"><a href="#0x02、安装Rabbitmq" class="headerlink" title="0x02、安装Rabbitmq"></a>0x02、安装Rabbitmq</h5><p>先更新apt源</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure><p>然后安装rabbitmq</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install rabbitmq-server</span><br></pre></td></tr></table></figure><a id="more"></a>
+        <h5 id="0x01、安装依赖erlang"><a href="#0x01、安装依赖erlang" class="headerlink" title="0x01、安装依赖erlang"></a>0x01、安装依赖erlang</h5><p>由于rabbitMq需要erlang语言的支持，在安装rabbitMq之前需要安装erlang</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install erlang-nox</span><br></pre></td></tr></table></figure><a id="more"></a>
 
-
-
-
-
+<h5 id="0x02、安装Rabbitmq"><a href="#0x02、安装Rabbitmq" class="headerlink" title="0x02、安装Rabbitmq"></a>0x02、安装Rabbitmq</h5><p>先更新apt源</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+<p>然后安装rabbitmq</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install rabbitmq-server</span><br></pre></td></tr></table></figure>
 <p>启动、停止、重启、状态rabbitMq命令，<a href="https://blog.csdn.net/u013256816/article/details/53524814" target="_blank" rel="noopener">详情使用链接请点击这里</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">服务启动关闭</span><br><span class="line">rabbitmq-server -detached  # 可以后台启动</span><br><span class="line">rabbitmqctl stop  # 可以停止</span><br><span class="line"></span><br><span class="line">下面是一些命令，但是有些测试了出现不能起作用</span><br><span class="line">sudo rabbitmq-server start  # 这个启动不能再后台启动，so不推荐使用</span><br><span class="line">sudo rabbitmq-server stop  # 好像不能使用这条命令，停止的正确命令在下面的命令，报错ERROR: node with name &quot;rabbit&quot; already running on &quot;develop&quot;</span><br><span class="line">sudo rabbitmq-server restart  # 这条好像也是不能起作用，报错ERROR: node with name &quot;rabbit&quot; already running on &quot;develop&quot;</span><br><span class="line">sudo rabbitmqctl status  # 可以查看运行的状态信息</span><br></pre></td></tr></table></figure>
 <h5 id="0x03、添加admin，并赋予administrator权限"><a href="#0x03、添加admin，并赋予administrator权限" class="headerlink" title="0x03、添加admin，并赋予administrator权限"></a>0x03、添加admin，并赋予administrator权限</h5><p>添加admin用户，密码设置为admin。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl add_user  admin  admin</span><br></pre></td></tr></table></figure></p>

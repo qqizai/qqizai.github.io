@@ -51,13 +51,13 @@
   };
 </script>
 
-  <meta name="description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上-i xxxx一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！">
+  <meta name="description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple">
 <meta name="keywords" content="Python,Pip">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一分钟学会——永久设置pip指定国内镜像源(含Windows和Linux)">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;03&#x2F;29&#x2F;set-pip-proxy&#x2F;index.html">
 <meta property="og:site_name" content="qizai">
-<meta property="og:description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上-i xxxx一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！">
+<meta property="og:description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190908104117779.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 <meta property="og:updated_time" content="2019-11-30T08:15:06.828Z">
@@ -272,9 +272,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>首先来看一下Python临时指定安装的镜像源：</p><h6 id="命令格式："><a href="#命令格式：" class="headerlink" title="命令格式："></a>命令格式：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install 包名 -i 镜像源url</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">sudo pip3 install redis -i http://pypi.douban.com/simple</span><br></pre></td></tr></table></figure><p>可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上<code>-i xxxx</code>一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！下面来看一下呗~</p><a id="more"></a>
+        <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>首先来看一下Python临时指定安装的镜像源：</p><h6 id="命令格式："><a href="#命令格式：" class="headerlink" title="命令格式："></a>命令格式：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install 包名 -i 镜像源url</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">sudo pip3 install redis -i http://pypi.douban.com/simple</span><br></pre></td></tr></table></figure><a id="more"></a>
 
-
+<p>可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上<code>-i xxxx</code>一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！下面来看一下呗~</p>
 <h5 id="一、永久设置windows镜像源"><a href="#一、永久设置windows镜像源" class="headerlink" title="一、永久设置windows镜像源"></a>一、永久设置windows镜像源</h5><p>打开<code>windows</code>C盘，路径如下：<code>C:\Users\xxx(你的登录用户名)</code></p>
 <p>无论你们电脑的pip版本是pip/pip2/pip3，都是创建pip文件夹，然后在文件夹里面创建pip.ini配置文件，内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line"></span><br><span class="line">index-url = http://pypi.douban.com/simple</span><br><span class="line">trusted-host = pypi.douban.com</span><br><span class="line"></span><br><span class="line">;index-url = https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">;trusted-host = pypi.tuna.tsinghua.edu.cn</span><br><span class="line"></span><br><span class="line">timeout = 6000</span><br></pre></td></tr></table></figure>
