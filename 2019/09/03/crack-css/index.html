@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-qizai-32-32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="qizai" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言本次来解锁新姿势——CSS字体反爬。1234在解决这个字体反爬的路上，当我以为解决这个反爬手段的时候，最后验证总的答案的时候，被打脸了！！！又被默默设埋伏了，踩了一个坑，巨大的，为何悲伤辣么大 &amp;lt;(－︿－)&amp;gt;不将html源码页面下载下来还真发现不了在哪写错了，不多说，赶紧来看一下呗~~">
+<meta name="keywords" content="反爬虫,字体反爬,CSS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS字体反爬实战，10分钟就能学会">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;09&#x2F;03&#x2F;crack-css&#x2F;index.html">
+<meta property="og:site_name" content="qizai">
+<meta property="og:description" content="前言本次来解锁新姿势——CSS字体反爬。1234在解决这个字体反爬的路上，当我以为解决这个反爬手段的时候，最后验证总的答案的时候，被打脸了！！！又被默默设埋伏了，踩了一个坑，巨大的，为何悲伤辣么大 &amp;lt;(－︿－)&amp;gt;不将html源码页面下载下来还真发现不了在哪写错了，不多说，赶紧来看一下呗~~">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142418441.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142453989.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142527463.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142717895.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142816149.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142829854.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142920870.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142949733.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824143408800.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824143432189.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824143508360.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824144003541.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-11-30T08:09:06.867Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190824142418441.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2019/09/03/crack-css/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>CSS字体反爬实战，10分钟就能学会 | qizai</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">qizai</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一个在IT行业摸爬打滚的程序猿</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/qqizai" class="github-corner" title="Qizai GitHub" aria-label="Qizai GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/03/crack-css/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qizai.png">
+      <meta itemprop="name" content="qizai">
+      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qizai">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSS字体反爬实战，10分钟就能学会
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-03 03:39:37" itemprop="dateCreated datePublished" datetime="2019-09-03T03:39:37+08:00">2019-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-30 16:09:06" itemprop="dateModified" datetime="2019-11-30T16:09:06+08:00">2019-11-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8F%8D%E7%88%AC%E8%99%AB/" itemprop="url" rel="index">
+                    <span itemprop="name">反爬虫</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><h6 id="本次来解锁新姿势——CSS字体反爬。"><a href="#本次来解锁新姿势——CSS字体反爬。" class="headerlink" title="本次来解锁新姿势——CSS字体反爬。"></a>本次来解锁新姿势——CSS字体反爬。</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在解决这个字体反爬的路上，当我以为解决这个反爬手段的时候，</span><br><span class="line">最后验证总的答案的时候，被打脸了！！！</span><br><span class="line">又被默默设埋伏了，踩了一个坑，巨大的，为何悲伤辣么大 &lt;(－︿－)&gt;</span><br><span class="line">不将html源码页面下载下来还真发现不了在哪写错了，不多说，赶紧来看一下呗~~</span><br></pre></td></tr></table></figure><a id="more"></a>
+<h5 id="0x01、分析目标网站"><a href="#0x01、分析目标网站" class="headerlink" title="0x01、分析目标网站"></a>0x01、分析目标网站</h5><ol>
+<li><p>还是同样的手段，打开F12进行选中数字，查看它的标签内容是什么<br><img src="https://img-blog.csdnimg.cn/20190824142418441.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>很明显，看了三个标签，只有第一个是对上的，其他两个是对不上的，难道是所有页面都是第一个对上，后面数字都打乱？并不是的，经过多次请求发现，每次都是随机打乱的，打乱的看起来好像没有规则。</p>
+</li>
+<li><p>那我也随便找找，看看有什么突破口不，首先去找id属性去全局搜索，看一下有什么相关内容<br><img src="https://img-blog.csdnimg.cn/20190824142453989.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>出现关联的数据如下：<br><img src="https://img-blog.csdnimg.cn/20190824142527463.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190824142717895.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>出现的这两个东西，突然不知道是啥，那我就去谷歌一下呗，发现这两个是css知识里面的东西，又涨知识了</p>
+</li>
+</ol>
+<blockquote>
+<p>Tips：这些属性在文末有提到，可以翻到后面一起对照看</p>
+</blockquote>
+<ol>
+<li>竟然没有什么突破口，那我继续搜索多几个看看<br><img src="https://img-blog.csdnimg.cn/20190824142816149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190824142829854.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<ul>
+<li>[x] 看，这个content:”202”不就是我们想要的吗，太爽了，终于找到一点点突破口了，谷歌百度一下这个:before你会发现它是CSS里面的属性</li>
+</ul>
+<ol>
+<li><p>再继续找找其他的数字看看，比如看到这个数字128：<br><img src="https://img-blog.csdnimg.cn/20190824142920870.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>搜索这个属性看看，又发现了两个属性：position、left。position顾名思义就是位置的属性，用relative表示，翻译过来就是相对位置的意思<br><img src="https://img-blog.csdnimg.cn/20190824142949733.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>跟前端展示的综合起来，大概的意思就是：相对的位置，然后left表示偏移的方向及偏移多少，然后最终才是我们肉眼在前端看到的正确位置的数字，那开始造起来呗，<strong>just do IT</strong>！</p>
+</li>
+</ol>
+<h5 id="0x02、核心代码"><a href="#0x02、核心代码" class="headerlink" title="0x02、核心代码"></a>0x02、核心代码</h5><h6 id="1-、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型"><a href="#1-、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型" class="headerlink" title="(1)、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型"></a>(1)、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">import re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse_offset(div_list, response_str):</span><br><span class="line">    &quot;&quot;&quot;提取那种是偏移量的情况&quot;&quot;&quot;</span><br><span class="line">    if len(div_list) == 4:</span><br><span class="line">        real_div = div_list[1:]</span><br><span class="line">        num = [&quot;0&quot;, &quot;0&quot;, &quot;0&quot;]</span><br><span class="line">    else:</span><br><span class="line">        real_div = div_list</span><br><span class="line">        if len(real_div) == 3:</span><br><span class="line">            num = [&quot;0&quot;, &quot;0&quot;, &quot;0&quot;]  # 用来存储正确位置的数值，最后将它们用字符串连接起来，再转化为int</span><br><span class="line">        elif len(real_div) == 2:</span><br><span class="line">            num = [&quot;0&quot;, &quot;0&quot;]</span><br><span class="line">        elif len(real_div) == 1:</span><br><span class="line">            num = [&quot;0&quot;]</span><br><span class="line">            print(&quot;---特殊情况长度为:&#123;&#125;，直接就是原来标签内容real_div:&#123;&#125;&quot;.format(len(div_list), real_div))</span><br><span class="line">        else:</span><br><span class="line">            print(&quot;----严重致命错误，real_div长度匹配不上，请检查.len(real_div):&#123;&#125;&quot;.format(len(real_div)))</span><br><span class="line">            num = []</span><br><span class="line">    pattern_left = r&quot;(?&lt;=.%s &#123; left:)(.*?)(?=em)&quot;  # 提取位移值</span><br><span class="line"></span><br><span class="line">    for index, div in enumerate(real_div):</span><br><span class="line">        class_name = div.xpath(&quot;./@class&quot;).extract_first(&quot;&quot;)</span><br><span class="line">        content = div.xpath(&quot;./text()&quot;).extract_first(&quot;&quot;)  # 提取数字</span><br><span class="line">        is_left = re.search(pattern_left%class_name, response_str, re.S)  # 偏移情况</span><br><span class="line"></span><br><span class="line">        if not is_left:  # 顺序完全一致的情况下，可以添加</span><br><span class="line">            num[index] = content</span><br><span class="line">            continue</span><br><span class="line">        else:  # 数值出现异位情况</span><br><span class="line">            left_num = int(is_left.group()) if is_left else None</span><br><span class="line">            if not left_num:</span><br><span class="line">                print(&quot;在匹配到位置的re对象不为空的情况下，为啥还是取不到位移值？请检查是否出现错误.class_name:&#123;&#125; num:&#123;&#125; re对象left_num:&#123;&#125;&quot;.format(class_name, num,left_num))</span><br><span class="line">                raise ValueError(&quot;获取偏移量的时候，出现异常,理论上这里是不会触发的，因为前面已经判断是已经有值了，所有这里是不会出现这种情况的&quot;)</span><br><span class="line">            num[index + left_num] = content</span><br><span class="line">    result = &quot;&quot;.join(num)</span><br><span class="line">    print(&quot;当前标签匹配最终结果如下 num:&#123;&#125; real_div:&#123;&#125; div_list:&#123;&#125;&quot;.format(num, real_div, div_list))</span><br><span class="line">    return int(result)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse_numbers(div_html, response_str):</span><br><span class="line">	&quot;&quot;&quot;</span><br><span class="line">    :param div_html: 传进来的xpath对象，div[@class=&apos;col-md-1&apos;]</span><br><span class="line">    :param response_str: html源码，也就是response.text</span><br><span class="line">    :return:int，返回当前div标签的真正数值</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    div_list = div_html.xpath(&quot;./div&quot;)  # 获取div[@class=&apos;col-md-1&apos;]下的所有div标签</span><br><span class="line"></span><br><span class="line">    if len(div_list) &lt; 3:  # todo: 长度小于3的(1和2)，若为2，那么提取第二个标签的值</span><br><span class="line">        div = div_list[-1]  # 取最后一个. 长度为1和2都是适用的</span><br><span class="line">        class_name = div.xpath(&quot;./@class&quot;).extract_first(&quot;&quot;)</span><br><span class="line">        pattern = &quot;(?&lt;=.%s:before &#123; content:\&quot;)(.*?)(?=\&quot;)&quot; % class_name  # .sklgp0fhDg:before &#123; content:&quot;116&quot; &#125;  这种情况就是</span><br><span class="line">        num = re.search(pattern, response_str, re.S)</span><br><span class="line">        num = num.group() if num else None</span><br><span class="line">        if not num:  # 当取不到值的时候，这里默认此时两位数的情况跟三位数的情况是一直的，就是出现位移的情况</span><br><span class="line">            num = parse_offset(div_list=div_list, response_str=response_str)</span><br><span class="line">        return int(num)</span><br><span class="line">    elif len(div_list) == 3 or len(div_list) == 4:   # todo: 长度为3的,这里是直接通过计算便宜量，复原数字;长度为4的就是直接就是有个div不展示</span><br><span class="line">        num = parse_offset(div_list=div_list, response_str=response_str)</span><br><span class="line">        return num</span><br><span class="line">    else:</span><br><span class="line">        print(&quot;长度找不到匹配项.当前长度为:&#123;&#125; div_list:&#123;&#125;&quot;.format(len(div_list), div_list))</span><br><span class="line">        raise ValueError(&quot;长度找不到匹配项.当前长度为:&#123;&#125; div_list:&#123;&#125;&quot;.format(len(div_list), div_list))</span><br></pre></td></tr></table></figure>
+<p>到此，我==以为==我是用正确的姿势==解决==这种问题了，可惜==并不是！！并不是！！！==<br>这中间我通过一边下载html源码一边慢慢核对前端展示的数值跟代码返回的是否一样的时候，当我发现有些两位数的数值出现匹配错误的情况，匹配出来是3位数，这到底为什么呢</p>
+<h6 id="2-、下面将继续来看一下到底是为什么这样？"><a href="#2-、下面将继续来看一下到底是为什么这样？" class="headerlink" title="(2)、下面将继续来看一下到底是为什么这样？"></a>(2)、下面将继续来看一下到底是为什么这样？</h6><p>将这种特殊两位数的，匹配出三位数的情况，进行分析，搜索id属性<br><img src="https://img-blog.csdnimg.cn/20190824143408800.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<ol>
+<li>这次又发现了一个属性，==<strong>opacity属性</strong>==，这个翻译过来是“不透明度”的意思，<a href="https://www.runoob.com/cssref/css3-pr-opacity.html" target="_blank" rel="noopener">点击我进行了解</a></li>
+</ol>
+<p>查看介绍，大概明白了，html源码可以通过设置元素的透明度，来达到前端肉眼是否看到的效果，如果设置为0则表示完全透明，为1则表示完全不透明</p>
+<ol>
+<li>下面我通过修改html源码的opacity属性进行剖析，发现设置opacity属性为0和1是得到不同的结果<br><img src="https://img-blog.csdnimg.cn/20190824143432189.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190824143508360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>那为什么是重叠的呢？其实刚刚搜索出来的结果还有一个属性，叫==margin-right==，这个属性在CSS里面用来设置边距的，那么我们将原来的属性注释掉或者修改为0看看得到什么结果：<br><img src="https://img-blog.csdnimg.cn/20190824144003541.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><h6 id="3-、小结"><a href="#3-、小结" class="headerlink" title="(3)、小结"></a>(3)、小结</h6><ul>
+<li>[x] <strong>来小结一下前面几个属性</strong><br>如果不是很明白那些属性，那么去谷歌或者百度一下，看看这些都是代表什么含义</li>
+</ul>
+</li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>width:2em</td>
+<td>是字体宽度大小。    它是描述相对于应用在当前元素的字体尺寸，所以它也是相对长度单位。一般浏览器字体大小默认为16px，则2em == 32px；<a href="https://www.runoob.com/cssref/css-units.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+<tr>
+<td>float:left</td>
+<td>把图像向左浮动，<a href="https://www.runoob.com/cssref/pr-class-float.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+<tr>
+<td>:before { content “202” }</td>
+<td>:before 选择器向选定的元素前插入内容,使用content 属性来指定要插入的内容，<a href="https://www.runoob.com/cssref/sel-before.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+<tr>
+<td>left:-2em</td>
+<td>把当前元素向右移-2em单位，即等于向左移2em单位，<a href="https://www.runoob.com/cssref/pr-pos-left.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+<tr>
+<td>opacity</td>
+<td>透明度属性，取值范围为0-1,。为0表示完全透明，为1表示完全不透明，<a href="https://www.runoob.com/cssref/css3-pr-opacity.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+<tr>
+<td>margin</td>
+<td>外边距，<a href="https://www.runoob.com/css/css-margin.html" target="_blank" rel="noopener">详解</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>总结一下这种CSS反爬手段解决顺序：</p>
+<ol>
+<li>首先判断元素是否透明：当我们遇到存在opacity属性为0的就是可以忽略它，不是0的就继续判断后面的</li>
+<li>判断其大致规律性，如下(根据==不同网站==来设置，本文教程的大致规律性不一定符合所有CSS反爬手段的网站，需要==适当调整一下==)：<pre><code> div标签长度为3的可能：乱序的，或者顺序的，或者第一个标签是透明的，真正展示的应该是两位数字的；
+ div标签长度为4的可能：有一个标签是不展示的，剩下三个标签是乱序的或者是顺序的（这个使用属于长度为3的情况去判断）
+ div标签长度为2的可能：目前发现的，只有包含:before的div标签是可用的，另外一个标签的内容是可以忽略的
+</code></pre></li>
+</ol>
+<p>由于本文教程是，最后才发现opacity属性的，所以我代码里面并不是第一步判断opacity属性，但是我在总结的时候，个人推荐，先判断opacity属性，如果为透明的话，都可以直接跳过那个元素了</p>
+<h6 id="4-、最终代码"><a href="#4-、最终代码" class="headerlink" title="(4)、最终代码"></a>(4)、最终代码</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/python3</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"># @Time    : 2019/8/20 13:34</span><br><span class="line"># @Author  : qizai</span><br><span class="line"># @File    : crawl_decode_css.py</span><br><span class="line"># @Software: PyCharm</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">    # .jOjM12plqO &#123;position: relative&#125;  # 存在这种情况就是表示，是相对的位置，如果没有这个属性则表示不用调整位置</span><br><span class="line">    # .jOjM12plqO &#123;float: left&#125;  # 或者说，存在这种情况也可以是不用发生位移的，就是原位</span><br><span class="line">    # .jOjM12plqO &#123;left: 1em&#125;  # 存在这种情况就是，需要发生位移的，也可以使用这个来判断是否需要位移</span><br><span class="line">    # .jOjM12plqO &#123;width: 1em&#125; # 这个是没有参考价值的</span><br><span class="line">    # .huD10lVv &#123; opacity:0 &#125;  # 这个神坑的属性，是叫透明度，取值范围为0-1，为0表示完全透明，为1表示完全不透明，可为小数</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">import re</span><br><span class="line">import requests</span><br><span class="line">from scrapy import Selector</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse_offset(div_list, response_str):</span><br><span class="line">    &quot;&quot;&quot;这里是单独的提取出来的，专门是提取那种是偏移量的情况&quot;&quot;&quot;</span><br><span class="line">    if len(div_list) == 4:</span><br><span class="line">        real_div = div_list[1:]</span><br><span class="line">        num = [&quot;0&quot;, &quot;0&quot;, &quot;0&quot;]</span><br><span class="line">    else:</span><br><span class="line">        real_div = div_list</span><br><span class="line">        if len(real_div) == 3:</span><br><span class="line">            num = [&quot;0&quot;, &quot;0&quot;, &quot;0&quot;]  # 用来存储正确位置的数值，最后将它们用字符串连接起来，再转化为int</span><br><span class="line">        elif len(real_div) == 2:</span><br><span class="line">            num = [&quot;0&quot;, &quot;0&quot;]</span><br><span class="line">        elif len(real_div) == 1:</span><br><span class="line">            num = [&quot;0&quot;]</span><br><span class="line">        else:</span><br><span class="line">            print(&quot;----严重致命错误，real_div长度匹配不上，请检查.len(real_div):&#123;&#125;&quot;.format(len(real_div)))</span><br><span class="line">            num = []</span><br><span class="line">    pattern_opacity = r&quot;.%s &#123; opacity:0 &#125;&quot;  # 出现opacity:0的表示完全透明，这时候不用理会这个字</span><br><span class="line">    pattern_left = r&quot;(?&lt;=.%s &#123; left:)(.*?)(?=em)&quot;  # 提取位移值</span><br><span class="line"></span><br><span class="line">    for index, div in enumerate(real_div):</span><br><span class="line">        # print(&quot;当前标签的num:&#123;&#125; index:&#123;&#125; div:&#123;&#125; real_div:&#123;&#125; div_list:&#123;&#125;&quot;.format(num, index, div, real_div, div_list))</span><br><span class="line">        class_name = div.xpath(&quot;./@class&quot;).extract_first(&quot;&quot;)</span><br><span class="line">        content = div.xpath(&quot;./text()&quot;).extract_first(&quot;&quot;)  # 提取数字</span><br><span class="line">        is_opacity = re.search(pattern_opacity % class_name, response_str, re.S)  # 是否为透明状态</span><br><span class="line">        is_left = re.search(pattern_left%class_name, response_str, re.S)  # 偏移情况</span><br><span class="line"></span><br><span class="line">        # 后来新增透明度判断</span><br><span class="line">        if is_opacity:</span><br><span class="line">            print(&quot;匹配到为完全透明的情况，请检查是否真的是完全透明，当前的class_name:&#123;&#125; num:&#123;&#125; num[&#123;&#125;]=&apos;-&apos;&quot;.format(class_name, num, index))</span><br><span class="line">            num[index] = &quot;-&quot;</span><br><span class="line">            continue</span><br><span class="line"></span><br><span class="line">        if not is_left:  # 顺序完全一致的情况下，可以添加</span><br><span class="line">            print(&quot;匹配不到偏移量，请检查是否真的是出现不偏移的情况，当前的class_name:&#123;&#125; num:&#123;&#125; num[&#123;&#125;]=&#123;&#125;&quot;.format(class_name, num, index, content))</span><br><span class="line">            num[index] = content</span><br><span class="line">            continue</span><br><span class="line">        else:  # 数值出现异位情况</span><br><span class="line">            left_num = int(is_left.group()) if is_left else None</span><br><span class="line">            if not left_num:</span><br><span class="line">                print(&quot;在匹配到位置的re对象不为空的情况下，为啥还是取不到位移值？请检查是否出现错误.class_name:&#123;&#125; num:&#123;&#125; re对象left_num:&#123;&#125;&quot;.format(class_name, num,left_num))</span><br><span class="line">                raise ValueError(&quot;获取偏移量的时候，出现异常,理论上这里是不会触发的，因为前面已经判断是已经有值了，所有这里是不会出现这种情况的&quot;)</span><br><span class="line">            num[index + left_num] = content</span><br><span class="line">    last_num = [i for i in num if i!=&quot;-&quot;]</span><br><span class="line">    result = &quot;&quot;.join(last_num)</span><br><span class="line">    print(&quot;当前标签匹配最终结果如下 num:&#123;&#125; real_div:&#123;&#125; div_list:&#123;&#125;&quot;.format(num, real_div, div_list))</span><br><span class="line">    return int(result)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse_numbers(div_html, response_str):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    :param div_html: 传进来的xpath对象，div[@class=&apos;col-md-1&apos;]</span><br><span class="line">    :param response_str: html源码，也就是response.text</span><br><span class="line">    :return:int，返回当前div标签的真正数值</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    div_list = div_html.xpath(&quot;./div&quot;)  # 获取div[@class=&apos;col-md-1&apos;]下的所有div标签</span><br><span class="line"></span><br><span class="line">    if len(div_list) &lt; 3:  # todo: 长度小于3的(1和2)，若为2，那么提取第二个标签的值</span><br><span class="line">        div = div_list[-1]  # 取最后一个. 长度为1和2都是适用的</span><br><span class="line">        class_name = div.xpath(&quot;./@class&quot;).extract_first(&quot;&quot;)</span><br><span class="line">        pattern = &quot;(?&lt;=.%s:before &#123; content:\&quot;)(.*?)(?=\&quot;)&quot; % class_name  # .sklgp0fhDg:before &#123; content:&quot;116&quot; &#125;  这种情况就是</span><br><span class="line">        num = re.search(pattern, response_str, re.S)</span><br><span class="line">        num = num.group() if num else None</span><br><span class="line">        if not num:  # 当取不到值的时候，这里默认此时两位数的情况跟三位数的情况是一直的，就是出现位移的情况</span><br><span class="line">            num = parse_offset(div_list=div_list, response_str=response_str)</span><br><span class="line">            print(&quot;[flag=2] num:&#123;&#125; 当前div长度小于3，但是处理的却是按照3/4的处理，返回的结果情况前面&quot;.format(num))</span><br><span class="line">        return int(num)</span><br><span class="line">    elif len(div_list) == 3 or len(div_list) == 4:   # todo: 长度为3的,这里是直接通过计算便宜量，复原数字;长度为4的就是直接就是有个div不展示</span><br><span class="line">        num = parse_offset(div_list=div_list, response_str=response_str)</span><br><span class="line">        print(&quot;len(div_list) == 3 or len(div_list) == 4的返回值num:&#123;&#125;&quot;.format(num))</span><br><span class="line">        return num</span><br><span class="line">    else:</span><br><span class="line">        print(&quot;长度找不到匹配项.当前长度为:&#123;&#125; div_list:&#123;&#125;&quot;.format(len(div_list), div_list))</span><br><span class="line">        raise ValueError(&quot;长度找不到匹配项.当前长度为:&#123;&#125; div_list:&#123;&#125;&quot;.format(len(div_list), div_list))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get_html():</span><br><span class="line">    url = &quot;xxxx&quot;</span><br><span class="line">    resp = requests.get(url)</span><br><span class="line">    selec = Selector(resp)</span><br><span class="line">    div_html = selec.xpath(&apos;//div[@class=&quot;col-md-1&quot;]&apos;)</span><br><span class="line">    for one in div_html:</span><br><span class="line">        real_num = parse_numbers(div_html=one, response_str=resp.text)</span><br><span class="line">        print(&quot;解析之后真正的num为:&#123;&#125;&quot;.format(real_num))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    get_html()</span><br></pre></td></tr></table></figure>
+<h5 id="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"></a>至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</h5><h5 id="感谢认真读完这篇教程的您"><a href="#感谢认真读完这篇教程的您" class="headerlink" title="感谢认真读完这篇教程的您"></a>感谢认真读完这篇教程的您</h5><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会</a>；<br><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/" rel="tag"># 反爬虫</a>
+              <a href="/tags/%E5%AD%97%E4%BD%93%E5%8F%8D%E7%88%AC/" rel="tag"># 字体反爬</a>
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/08/27/js-know/" rel="next" title="爬虫：js逆向目前遇到的知识点集合">
+                  <i class="fa fa-chevron-left"></i> 爬虫：js逆向目前遇到的知识点集合
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/09/05/crack-selecnuim-or-pyppeteer/" rel="prev" title="必知必会:selenuim/pyppeteer模拟登陆防检测,能够屏蔽一小部分简单的检测">
+                  必知必会:selenuim/pyppeteer模拟登陆防检测,能够屏蔽一小部分简单的检测 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#本次来解锁新姿势——CSS字体反爬。"><span class="nav-number">1.1.</span> <span class="nav-text">本次来解锁新姿势——CSS字体反爬。</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x01、分析目标网站"><span class="nav-number">2.</span> <span class="nav-text">0x01、分析目标网站</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x02、核心代码"><span class="nav-number">3.</span> <span class="nav-text">0x02、核心代码</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#1-、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型"><span class="nav-number">3.1.</span> <span class="nav-text">(1)、下面代码就是核心判断字体是否是出现偏移或者是before属性的类型</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-、下面将继续来看一下到底是为什么这样？"><span class="nav-number">3.2.</span> <span class="nav-text">(2)、下面将继续来看一下到底是为什么这样？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#3-、小结"><span class="nav-number">3.3.</span> <span class="nav-text">(3)、小结</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#4-、最终代码"><span class="nav-number">3.4.</span> <span class="nav-text">(4)、最终代码</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><span class="nav-number">4.</span> <span class="nav-text">至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#感谢认真读完这篇教程的您"><span class="nav-number">5.</span> <span class="nav-text">感谢认真读完这篇教程的您</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="qizai"
+      src="/images/qizai.png">
+  <p class="site-author-name" itemprop="name">qizai</p>
+  <div class="site-description" itemprop="description">目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qizai</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.5.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      element.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '44618db3409b8e2ef4db',
+      clientSecret: '61a79fe046604cf8e5be252a5b8a2b9384c0609f',
+      repo: 'qqizai.github.io',
+      owner: 'qqizai',
+      admin: ['qqizai'],
+      id: '116d0bed17f1939dbf7d1c670ceb9b59',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+    </div>
+</body>
+</html>

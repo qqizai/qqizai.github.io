@@ -51,18 +51,20 @@
   };
 </script>
 
-  <meta name="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
-<meta name="keywords" content="Python，爬虫，逆向，运维">
-<meta property="og:type" content="website">
-<meta property="og:title" content="css_crack">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;css-crack&#x2F;index.html">
+  <meta name="description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上-i xxxx一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！">
+<meta name="keywords" content="Python,Pip">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一分钟学会——永久设置pip指定国内镜像源(含Windows和Linux)">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;30&#x2F;set-pip-proxy&#x2F;index.html">
 <meta property="og:site_name" content="qizai">
-<meta property="og:description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+<meta property="og:description" content="前言首先来看一下Python临时指定安装的镜像源：命令格式：1234sudo pip3 install 包名 -i 镜像源urleg:sudo pip3 install redis -i http:&#x2F;&#x2F;pypi.douban.com&#x2F;simple可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上-i xxxx一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-10T09:16:06.954Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190908104117779.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-11-30T08:06:51.803Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190908104117779.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 
-<link rel="canonical" href="http://yoursite.com/css-crack/">
+<link rel="canonical" href="http://yoursite.com/2019/11/30/set-pip-proxy/">
 
 
 <script id="page-configurations">
@@ -70,14 +72,13 @@
   CONFIG.page = {
     sidebar: "",
     isHome: false,
-    isPost: false,
-    isPage: true,
+    isPost: true,
+    isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>css_crack | qizai
-  </title>
+  <title>一分钟学会——永久设置pip指定国内镜像源(含Windows和Linux) | qizai</title>
   
 
 
@@ -207,44 +208,122 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
           <div class="content">
             
 
   <div class="posts-expand">
-    
-    
-    
-    <div class="post-block" lang="zh-CN">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/30/set-pip-proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qizai.png">
+      <meta itemprop="name" content="qizai">
+      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qizai">
+    </span>
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一分钟学会——永久设置pip指定国内镜像源(含Windows和Linux)
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">css_crack
-</h1>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
 
-<div class="post-meta">
+              <time title="创建时间：2019-11-30 15:49:53 / 修改时间：16:06:51" itemprop="dateCreated datePublished" datetime="2019-11-30T15:49:53+08:00">2019-11-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p>首先来看一下Python临时指定安装的镜像源：</p><h6 id="命令格式："><a href="#命令格式：" class="headerlink" title="命令格式："></a>命令格式：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 install 包名 -i 镜像源url</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">sudo pip3 install redis -i http://pypi.douban.com/simple</span><br></pre></td></tr></table></figure><p>可能临时的指定镜像源安装已经不再符合你的口味了，因为每次安装都是要加上<code>-i xxxx</code>一大串，有点浪费生命啊,那么有没有永久设置镜像源的方法呢？那肯定有啊！下面来看一下呗~</p><a id="more"></a>
+
+
+<h5 id="一、永久设置windows镜像源"><a href="#一、永久设置windows镜像源" class="headerlink" title="一、永久设置windows镜像源"></a>一、永久设置windows镜像源</h5><p>打开<code>windows</code>C盘，路径如下：<code>C:\Users\xxx(你的登录用户名)</code></p>
+<p>无论你们电脑的pip版本是pip/pip2/pip3，都是创建pip文件夹，然后在文件夹里面创建pip.ini配置文件，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line"></span><br><span class="line">index-url = http://pypi.douban.com/simple</span><br><span class="line">trusted-host = pypi.douban.com</span><br><span class="line"></span><br><span class="line">;index-url = https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">;trusted-host = pypi.tuna.tsinghua.edu.cn</span><br><span class="line"></span><br><span class="line">timeout = 6000</span><br></pre></td></tr></table></figure>
+<p>可以参考如下图：<br><img src="https://img-blog.csdnimg.cn/20190908104117779.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="创建pip文件夹及pip.ini文件"></p>
+<h5 id="二、Linux设置永久镜像源"><a href="#二、Linux设置永久镜像源" class="headerlink" title="二、Linux设置永久镜像源"></a>二、Linux设置永久镜像源</h5><p>先检查用户目录下是否存在目录.pip目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ll  ~/.pip</span><br></pre></td></tr></table></figure></p>
+<p>如果看出来是存在的，那么，切换到该目录下,并且创建pip.conf文件(存在直接修改即可)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cd ~/.pip/</span><br><span class="line"></span><br><span class="line">vim ~/.pip/pip.conf</span><br><span class="line">里面的内容也是如下：</span><br><span class="line"></span><br><span class="line">------------------------------我是可爱的分割线开始处-----------------------------</span><br><span class="line">[global]</span><br><span class="line"></span><br><span class="line">index-url = http://pypi.douban.com/simple</span><br><span class="line">trusted-host = pypi.douban.com</span><br><span class="line"></span><br><span class="line">;index-url = https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">;trusted-host = pypi.tuna.tsinghua.edu.cn</span><br><span class="line"></span><br><span class="line">timeout = 6000</span><br><span class="line">-----------------------------我是可爱的分割线结束处------------------------------</span><br><span class="line"></span><br><span class="line">然后保存退出即可</span><br></pre></td></tr></table></figure>
+<p>国内其他pip源</p>
+<pre><code>清华：https://pypi.tuna.tsinghua.edu.cn/simple
+中国科技大学 https://pypi.mirrors.ustc.edu.cn/simple/
+华中理工大学：http://pypi.hustunique.com/
+山东理工大学：http://pypi.sdutlinux.org/
+豆瓣：http://pypi.douban.com/simple/
+</code></pre><p>注意：不管你用的是pip3还是pip，亦或是pip2，方法都是一样的，都是创建pip文件夹。</p>
+<h5 id="感谢您的阅读"><a href="#感谢您的阅读" class="headerlink" title="感谢您的阅读"></a>感谢您的阅读</h5><p>先别走呗，这里有可能有你需要的文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/83472776" target="_blank" rel="noopener">python最好用的第三方库资源下载网址</a><br><a href="https://blog.csdn.net/weixin_41173374/article/details/81516304" target="_blank" rel="noopener">详细讲解aiohttp异步请求及使用，高效率</a><br><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>；<br><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/Pip/" rel="tag"># Pip</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/09/10/to-requeirements/" rel="next" title="自动扫描当前Python项目，生成依赖清单">
+                  <i class="fa fa-chevron-left"></i> 自动扫描当前Python项目，生成依赖清单
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/30/nagios/" rel="prev" title="nagios">
+                  nagios <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
-          
-      </div>
-      
-      
-      
-    </div>
-    
-
-    
-    
-    
   </div>
 
 
@@ -275,6 +354,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#命令格式："><span class="nav-number">1.1.</span> <span class="nav-text">命令格式：</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一、永久设置windows镜像源"><span class="nav-number">2.</span> <span class="nav-text">一、永久设置windows镜像源</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#二、Linux设置永久镜像源"><span class="nav-number">3.</span> <span class="nav-text">二、Linux设置永久镜像源</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#感谢您的阅读"><span class="nav-number">4.</span> <span class="nav-text">感谢您的阅读</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -467,7 +547,7 @@ window.addEventListener('pjax:success', () => {
       repo: 'qqizai.github.io',
       owner: 'qqizai',
       admin: ['qqizai'],
-      id: '980988ccd76f824cc9fdd3d8df21a93b',
+      id: '1b3277dbf1ce86ac88defe4149941976',
         language: 'zh-CN',
       distractionFreeMode: 'true'
     });

@@ -52,7 +52,7 @@
 </script>
 
   <meta name="description" content="声明：本帖子仅是用于学习用途，请勿与用于恶意破坏别人网站，本人不承担法律责任。来继续学爬虫呀！前言简单描述一下这种手段，html源码的数字跟页面展示的数字是不一致的！当时就一脸黑人问号，嗯？？？123经过分析，当前这种字体反爬机制是：通过获取指定链接的woff字体文件，然后根据html源码的数字去woff字体文件里面查找真正的数字，讲到底就是一个映射关系&#x2F;查找字典。如html源码是123，去wof">
-<meta name="keywords" content="反爬虫">
+<meta name="keywords" content="反爬虫,Python,字体反爬">
 <meta property="og:type" content="article">
 <meta property="og:title" content="woff字体反爬实战，10分钟就能学会(ttf字体同理)">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;08&#x2F;26&#x2F;crack-woff&#x2F;index.html">
@@ -67,7 +67,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190822133456757.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220839525.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826221219906.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
-<meta property="og:updated_time" content="2019-11-30T07:34:25.015Z">
+<meta property="og:updated_time" content="2019-11-30T08:08:16.557Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190826220504409.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
 
@@ -254,7 +254,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-30 15:34:25" itemprop="dateModified" datetime="2019-11-30T15:34:25+08:00">2019-11-30</time>
+                <time title="修改时间：2019-11-30 16:08:16" itemprop="dateModified" datetime="2019-11-30T16:08:16+08:00">2019-11-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -312,14 +312,16 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E5%8F%8D%E7%88%AC%E8%99%AB/" rel="tag"># 反爬虫</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E5%AD%97%E4%BD%93%E5%8F%8D%E7%88%AC/" rel="tag"># 字体反爬</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
-                <a href="/2019/08/25/hello-world/" rel="next" title="欢迎来到七仔的个人博客">
-                  <i class="fa fa-chevron-left"></i> 欢迎来到七仔的个人博客
+                <a href="/2019/08/10/download-ubuntu/" rel="next" title="ubuntu系统下载路径(可以收藏免得以后再找)">
+                  <i class="fa fa-chevron-left"></i> ubuntu系统下载路径(可以收藏免得以后再找)
                 </a>
             </div>
 
@@ -384,20 +386,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
