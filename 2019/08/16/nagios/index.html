@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-qizai-32-32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="qizai" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="0x00、前言至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）0x01、依赖环境先讲述一下这里需要的依赖是：nagios、ganglia、apache、Python2.7（及可能使用到Python2.7，为啥呢？因为你使用py脚本来扩展监控的话，那么，这里也需要安装一下，好像centos或者ubantu都是自带Python2.7的）">
+<meta name="keywords" content="运维,监控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最详细nagios配置说明及注意事项">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;08&#x2F;16&#x2F;nagios&#x2F;index.html">
+<meta property="og:site_name" content="qizai">
+<meta property="og:description" content="0x00、前言至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）0x01、依赖环境先讲述一下这里需要的依赖是：nagios、ganglia、apache、Python2.7（及可能使用到Python2.7，为啥呢？因为你使用py脚本来扩展监控的话，那么，这里也需要安装一下，好像centos或者ubantu都是自带Python2.7的）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190816172653355.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190816172824501.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190815221815350.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190815221607919.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190816173324387.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:updated_time" content="2019-11-30T08:10:47.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190816172653355.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/16/nagios/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>最详细nagios配置说明及注意事项 | qizai</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">qizai</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一个在IT行业摸爬打滚的程序猿</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/qqizai" class="github-corner" title="Qizai GitHub" aria-label="Qizai GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/16/nagios/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qizai.png">
+      <meta itemprop="name" content="qizai">
+      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qizai">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          最详细nagios配置说明及注意事项
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-16 16:00:00" itemprop="dateCreated datePublished" datetime="2019-08-16T16:00:00+08:00">2019-08-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-30 16:10:47" itemprop="dateModified" datetime="2019-11-30T16:10:47+08:00">2019-11-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index">
+                    <span itemprop="name">运维</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="0x00、前言"><a href="#0x00、前言" class="headerlink" title="0x00、前言"></a>0x00、前言</h5><h5 id="至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）"><a href="#至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）" class="headerlink" title="至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）"></a>至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）</h5><h5 id="0x01、依赖环境"><a href="#0x01、依赖环境" class="headerlink" title="0x01、依赖环境"></a>0x01、依赖环境</h5><p>先讲述一下这里需要的依赖是：nagios、ganglia、apache、Python2.7（及可能使用到Python2.7，为啥呢？因为你使用py脚本来扩展监控的话，那么，这里也需要安装一下，好像centos或者ubantu都是自带Python2.7的）</p><a id="more"></a>
+<h5 id="0x02、安装文件路径"><a href="#0x02、安装文件路径" class="headerlink" title="0x02、安装文件路径"></a>0x02、安装文件路径</h5><h6 id="tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！"><a href="#tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！" class="headerlink" title="tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！"></a>tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/nagios  # nagios安装路径，修改过默认安装路径的同学，自行替换哈</span><br></pre></td></tr></table></figure>
+<p>nagios目录包含如下文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:/usr/local$ tree nagios/ -L 1</span><br><span class="line">nagios</span><br><span class="line">├── bin      # Nagios 可执行程序所在目录</span><br><span class="line">├── etc      # 这个是有nagios重要配置的文件，如nagios.cfg文件</span><br><span class="line">├── libexec  # 这个是脚本的存放路径,即Nagios 外部插件所在目录</span><br><span class="line">├── sbin     # Nagios CGI 文件所在目录，也就是执行外部命令所需文件所在的目录</span><br><span class="line">├── share    # Nagios网页文件所在的目录</span><br><span class="line">└── var      # Nagios 日志文件、lock 等文件所在的目录</span><br></pre></td></tr></table></figure></p>
+<p>其中etc文件如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">root@localhost:/usr/local/nagios$ tree etc/ -L 1</span><br><span class="line"></span><br><span class="line">etc/</span><br><span class="line">├── cgi.cfg</span><br><span class="line">├── dallas</span><br><span class="line">├── htpasswd.users</span><br><span class="line">├── nagios.cfg    # 这个最为重要的nagios配置文件，包括但不限于定义cfg文件路径</span><br><span class="line">├── objects       # 这个是cfg文件所在目录，即配置监控主机的配置文件，建议每个主机建一个目录，然后另外存放来配置，这样好管理、好维护</span><br><span class="line">└── resource.cfg  # nagios的变量定义文件，文件内容只有一行，如下：</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;$USER1$=/usr/local/nagios/libexec&apos;&apos;&apos;  </span><br><span class="line">其中，变量$USER1$指定了安装nagios插件的路径，</span><br><span class="line">如果把插件安装在了其它路径，只需在这里进行修改即可。</span><br><span class="line">需要注意的是，变量必须先定义，然后才能在其它配置文件中进行引用，谨记啊，不然两行泪！！</span><br></pre></td></tr></table></figure>
+<h5 id="0x03、配置文件提到的概念"><a href="#0x03、配置文件提到的概念" class="headerlink" title="0x03、配置文件提到的概念"></a>0x03、配置文件提到的概念</h5><p>这些文件里面配置涉及的概念有：</p>
+<p>host主机、hostname域名、hostgroup主机组；service服务、servicegroup服务组；contacts联系人、contactsgroup联系人组；监控时间、command监控命令；</p>
+<p>除了以上还有其他概念，上面列出来的是常提到的概念。</p>
+<h5 id="0x04、下面来打个预防针———屡一下配置的思路"><a href="#0x04、下面来打个预防针———屡一下配置的思路" class="headerlink" title="0x04、下面来打个预防针———屡一下配置的思路"></a>0x04、下面来打个预防针———屡一下配置的思路</h5><h6 id="配置过程大致分为以下四步："><a href="#配置过程大致分为以下四步：" class="headerlink" title="配置过程大致分为以下四步："></a>配置过程大致分为以下四步：</h6><p>01：定义监控哪些主机、主机组、服务和服务组；</p>
+<p>02：定义这个监控要用什么命令实现；</p>
+<p>03：定义监控的时间段；</p>
+<p>04：定义主机或服务出现问题时要通知的联系人和联系人组。</p>
+<h5 id="0x05、开始配置旅程"><a href="#0x05、开始配置旅程" class="headerlink" title="0x05、开始配置旅程"></a>0x05、开始配置旅程</h5><h6 id="tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护"><a href="#tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护" class="headerlink" title="tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护"></a>tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nagios/etc/objects  # 切换到配置文件路径下</span><br><span class="line"></span><br><span class="line">创建对应主机.cfg文件，这里提示一下使用ip最后的数字来起名字,如192.168.1.51，则起名字为：host_51.cfg</span><br><span class="line">tips：这里创建的文件，建议直接复制原来的文件</span><br><span class="line"></span><br><span class="line">sudo cp localhost.cfg host_51.cfg</span><br><span class="line"></span><br><span class="line">然后其他的文件：</span><br><span class="line">contacts.cfg、command.cfg、timeperiods.cfg、templates.cfg</span><br><span class="line">就用原来的文件即可，只是使用的时候稍稍改一下下</span><br></pre></td></tr></table></figure>
+<p>templates.cfg是模板配置文件，很多共性的属性定义成模板，方便多次引用，以及不用重复定义，这就是templates.cfg的作用。</p>
+<h6 id="00、templates-cfg里面内容参数说明如下："><a href="#00、templates-cfg里面内容参数说明如下：" class="headerlink" title="00、templates.cfg里面内容参数说明如下："></a>00、templates.cfg里面内容参数说明如下：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">define contact&#123;</span><br><span class="line">        name                            generic-contact    ; 联系人名称</span><br><span class="line">        service_notification_period     24x7               ; 当服务出现异常时，发送通知的时间段，这个时间段&quot;24x7&quot;在timeperiods.cfg文件中定义</span><br><span class="line">        host_notification_period        24x7               ; 当主机出现异常时，发送通知的时间段，这个时间段&quot;24x7&quot;在timeperiods.cfg文件中定义</span><br><span class="line">        service_notification_options    w,u,c,r            ; 这个定义的是“通知可以被发出的情况”。w即warn，表示警告状态，u即unknown，表示不明状态;</span><br><span class="line">                                                           ; c即criticle，表示紧急状态，r即recover，表示恢复状态;</span><br><span class="line">                                                           ; 也就是在服务出现警告状态、未知状态、紧急状态和重新恢复状态时都发送通知给使用者。</span><br><span class="line">        host_notification_options       d,u,r                   ; 定义主机在什么状态下需要发送通知给使用者，d即down，表示宕机状态;</span><br><span class="line">                                                                ; u即unreachable，表示不可到达状态，r即recovery，表示重新恢复状态。</span><br><span class="line">        service_notification_commands   notify-service-by-email ; 服务故障时，发送通知的方式，可以是邮件和短信，这里发送的方式是邮件;</span><br><span class="line">                                                                ; 其中“notify-service-by-email”在commands.cfg文件中定义。</span><br><span class="line">        host_notification_commands      notify-host-by-email    ; 主机故障时，发送通知的方式，可以是邮件和短信，这里发送的方式是邮件;</span><br><span class="line">                                                                ; 其中“notify-host-by-email”在commands.cfg文件中定义。 </span><br><span class="line">        register                        0                    ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL CONTACT, JUST A TEMPLATE!</span><br><span class="line">        &#125;</span><br><span class="line">define host&#123;</span><br><span class="line">        name                            generic-host    ; 主机名称，这里的主机名，并不是直接对应到真正机器的主机名;</span><br><span class="line">                                                        ; 乃是对应到在主机配置文件里所设定的主机名。</span><br><span class="line">        notifications_enabled           1               ; Host notifications are enabled</span><br><span class="line">        event_handler_enabled           1               ; Host event handler is enabled</span><br><span class="line">        flap_detection_enabled          1               ; Flap detection is enabled</span><br><span class="line">        failure_prediction_enabled      1               ; Failure prediction is enabled</span><br><span class="line">        process_perf_data               1               ; 其值可以为0或1，其作用为是否启用Nagios的数据输出功能;</span><br><span class="line">                                                        ; 如果将此项赋值为1，那么Nagios就会将收集的数据写入某个文件中，以备提取。</span><br><span class="line">        retain_status_information       1               ; Retain status information across program restarts</span><br><span class="line">        retain_nonstatus_information    1               ; Retain non-status information across program restarts</span><br><span class="line">        notification_period             24x7            ; 指定“发送通知”的时间段，也就是可以在什么时候发送通知给使用者。</span><br><span class="line">        register                        0               ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL HOST, JUST A TEMPLATE!</span><br><span class="line">        &#125;</span><br><span class="line">define host&#123;</span><br><span class="line">        name                            linux-server    ; 主机名称</span><br><span class="line">        use                             generic-host    ; use表示引用，也就是将主机generic-host的所有属性引用到linux-server中来;</span><br><span class="line">                                                        ; 在nagios配置中，很多情况下会用到引用。</span><br><span class="line">        check_period                    24x7            ; 这里的check_period告诉nagios检查主机的时间段</span><br><span class="line">        check_interval                  5               ; nagios对主机的检查时间间隔，这里是5分钟。</span><br><span class="line">        retry_interval                  1               ; 重试检查时间间隔，单位是分钟。</span><br><span class="line">        max_check_attempts              10              ; nagios对主机的最大检查次数，也就是nagios在检查发现某主机异常时，并不马上判断为异常状况;</span><br><span class="line">                                                        ; 而是多试几次，因为有可能只是一时网络太拥挤，或是一些其他原因，让主机受到了一点影响;</span><br><span class="line">                                                        ; 这里的10就是最多试10次的意思。</span><br><span class="line">        check_command                   check-host-alive ; 指定检查主机状态的命令，其中“check-host-alive”在commands.cfg文件中定义。</span><br><span class="line">        notification_period             24x7            ; 主机故障时，发送通知的时间范围，其中“workhours”在timeperiods.cfg中进行了定义;</span><br><span class="line">                                                        ; 下面会陆续讲到。</span><br><span class="line">        notification_interval           10              ; 在主机出现异常后，故障一直没有解决，nagios再次对使用者发出通知的时间。单位是分钟;</span><br><span class="line">                                                        ; 如果你觉得，所有的事件只需要一次通知就够了，可以把这里的选项设为0</span><br><span class="line">        notification_options            d,u,r           ; 定义主机在什么状态下可以发送通知给使用者，d即down，表示宕机状态;</span><br><span class="line">                                                        ; u即unreachable，表示不可到达状态;</span><br><span class="line">                                                        ; r即recovery，表示重新恢复状态。</span><br><span class="line">        contact_groups                  ts              ; 指定联系人组，这个“admins”在contacts.cfg文件中定义。</span><br><span class="line">        register                        0               ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL HOST, JUST A TEMPLATE!</span><br><span class="line">        &#125;</span><br><span class="line">define host&#123;</span><br><span class="line">        name                    windows-server  ; The name of this host template</span><br><span class="line">        use                     generic-host    ; Inherit default values from the generic-host template</span><br><span class="line">        check_period            24x7            ; By default, Windows servers are monitored round the clock</span><br><span class="line">        check_interval          5               ; Actively check the server every 5 minutes</span><br><span class="line">        retry_interval          1               ; Schedule host check retries at 1 minute intervals</span><br><span class="line">        max_check_attempts      10              ; Check each server 10 times (max)</span><br><span class="line">        check_command           check-host-alive        ; Default command to check if servers are &quot;alive&quot;</span><br><span class="line">        notification_period     24x7            ; Send notification out at any time - day or night</span><br><span class="line">        notification_interval   10              ; Resend notifications every 30 minutes</span><br><span class="line">        notification_options    d,r             ; Only send notifications for specific host states</span><br><span class="line">        contact_groups          ts              ; Notifications get sent to the admins by default</span><br><span class="line">        hostgroups              windows-servers ; Host groups that Windows servers should be a member of</span><br><span class="line">        register                0               ; DONT REGISTER THIS - ITS JUST A TEMPLATE</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        name                            generic-service         ; 定义一个服务名称</span><br><span class="line">        active_checks_enabled           1                       ; Active service checks are enabled</span><br><span class="line">        passive_checks_enabled          1                       ; Passive service checks are enabled/accepted</span><br><span class="line">        parallelize_check               1                       ; Active service checks should be parallelized;</span><br><span class="line">                                                                ; (disabling this can lead to major performance problems)</span><br><span class="line">        obsess_over_service             1                       ; We should obsess over this service (if necessary)</span><br><span class="line">        check_freshness                 0                       ; Default is to NOT check service &apos;freshness&apos;</span><br><span class="line">        notifications_enabled           1                       ; Service notifications are enabled</span><br><span class="line">        event_handler_enabled           1                       ; Service event handler is enabled</span><br><span class="line">        flap_detection_enabled          1                       ; Flap detection is enabled</span><br><span class="line">        failure_prediction_enabled      1                       ; Failure prediction is enabled</span><br><span class="line">        process_perf_data               1                       ; Process performance data</span><br><span class="line">        retain_status_information       1                       ; Retain status information across program restarts</span><br><span class="line">        retain_nonstatus_information    1                       ; Retain non-status information across program restarts</span><br><span class="line">        is_volatile                     0                       ; The service is not volatile</span><br><span class="line">        check_period                    24x7             ; 这里的check_period告诉nagios检查服务的时间段。</span><br><span class="line">        max_check_attempts              3                ; nagios对服务的最大检查次数。</span><br><span class="line">        normal_check_interval           5                ; 此选项是用来设置服务检查时间间隔，也就是说，nagios这一次检查和下一次检查之间所隔的时间;</span><br><span class="line">                                                         ; 这里是5分钟。</span><br><span class="line">        retry_check_interval            2                ; 重试检查时间间隔，单位是分钟。</span><br><span class="line">        contact_groups                  ts           ; 指定联系人组</span><br><span class="line">        notification_options            w,u,c,r          ; 这个定义的是“通知可以被发出的情况”。w即warn，表示警告状态;</span><br><span class="line">                                                         ; u即unknown，表示不明状态;</span><br><span class="line">                                                         ; c即criticle，表示紧急状态，r即recover，表示恢复状态;</span><br><span class="line">                                                         ; 也就是在服务出现警告状态、未知状态、紧急状态和重新恢复后都发送通知给使用者。</span><br><span class="line">        notification_interval           10               ; Re-notify about service problems every hour</span><br><span class="line">        notification_period             24x7             ; 指定“发送通知”的时间段，也就是可以在什么时候发送通知给使用者。</span><br><span class="line">        register                        0                ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL SERVICE, JUST A TEMPLATE!</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        name                            local-service           ; The name of this service template</span><br><span class="line">        use                             generic-service         ; Inherit default values from the generic-service definition</span><br><span class="line">        max_check_attempts              4             ; Re-check the service up to 4 times in order to determine its final (hard) state</span><br><span class="line">        normal_check_interval           5             ; Check the service every 5 minutes under normal conditions</span><br><span class="line">        retry_check_interval            1             ; Re-check the service every minute until a hard state can be determined</span><br><span class="line">        register                        0             ; DONT REGISTER THIS DEFINITION - ITS NOT A REAL SERVICE, JUST A TEMPLATE!</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="01、commands-cfg文件"><a href="#01、commands-cfg文件" class="headerlink" title="01、commands.cfg文件"></a>01、commands.cfg文件</h6><p>此文件是默认存在的，基本不用怎么修改，当这些基本命令不再满足欲望强烈的你的时候，你可以在这个文件后面添加上你要扩展的命令名及其执行需要的参数，记得添加的命令的脚本要加到对应的文件夹，所谓对应的文件夹就是：==/usr/local/nagios/libexec==，或者你可以直接输入绝对路径也行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">#notify-host-by-email命令的定义 </span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    notify-host-by-email             #命令名称，即定义了一个主机异常时发送邮件的命令。</span><br><span class="line">        command_line    /usr/bin/printf &quot;%b&quot; &quot;***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n&quot; | /bin/mail -s &quot;** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **&quot; $CONTACTEMAIL$                                     #命令具体的执行方式。</span><br><span class="line">        &#125;</span><br><span class="line">#notify-service-by-email命令的定义 </span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    notify-service-by-email          #命令名称，即定义了一个服务异常时发送邮件的命令</span><br><span class="line">        command_line    /usr/bin/printf &quot;%b&quot; &quot;***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n&quot; | /bin/mail -s &quot;** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **&quot; $CONTACTEMAIL$</span><br><span class="line">        &#125;</span><br><span class="line">#check-host-alive命令的定义</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check-host-alive                 #命令名称，用来检测主机状态。</span><br><span class="line">        command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5             </span><br><span class="line">                        # 这里的变量$USER1$在resource.cfg文件中进行定义，即$USER1$=/usr/local/nagios/libexec;</span><br><span class="line">                        # 那么check_ping的完整路径为/usr/local/nagios/libexec/check_ping;</span><br><span class="line">                        # “-w 3000.0,80%”中“-w”说明后面的一对值对应的是“WARNING”状态，“80%”是其临界值。</span><br><span class="line">                        # “-c 5000.0,100%”中“-c”说明后面的一对值对应的是“CRITICAL”，“100%”是其临界值。</span><br><span class="line">                        # “-p 1”说明每次探测发送一个包。</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_local_disk</span><br><span class="line">        command_line    $USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$            #$ARG1$是指在调用这个命令的时候，命令后面的第一个参数。</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_local_load</span><br><span class="line">        command_line    $USER1$/check_load -w $ARG1$ -c $ARG2$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_local_procs</span><br><span class="line">        command_line    $USER1$/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_local_users</span><br><span class="line">        command_line    $USER1$/check_users -w $ARG1$ -c $ARG2$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_local_swap</span><br><span class="line">        command_line    $USER1$/check_swap -w $ARG1$ -c $ARG2$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_ftp</span><br><span class="line">        command_line    $USER1$/check_ftp -H $HOSTADDRESS$ $ARG1$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_http</span><br><span class="line">        command_line    $USER1$/check_http -I $HOSTADDRESS$ $ARG1$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_ssh</span><br><span class="line">        command_line    $USER1$/check_ssh $ARG1$ $HOSTADDRESS$</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_ping</span><br><span class="line">        command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$ -p 5</span><br><span class="line">        &#125;</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_nt</span><br><span class="line">        command_line    $USER1$/check_nt -H $HOSTADDRESS$ -p 12489 -v $ARG1$ $ARG2$</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">/*-----------------------我是超级无敌最可爱的分割线-----------------------*/</span><br><span class="line"># 例如添加以下命令：</span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_procs_nginx</span><br><span class="line">        command_line    $USER1$/check_procs -c 1: -a &apos;/usr/sbin/nginx&apos;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define command&#123;</span><br><span class="line">        command_name    check_procs_mysql</span><br><span class="line">        command_line    $USER1$/check_procs -c 1: -a &apos;/usr/sbin/mysqld&apos;</span><br><span class="line">        &#125;</span><br><span class="line"># 记得将以上命令的check_procs，记得检查你的脚本是否在/usr/local/nagios/libexec路径当中，不在自己去找一下，这脚本是通用的（算是通用的，别人造好的轮子）</span><br></pre></td></tr></table></figure>
+<h6 id="02、resource-cfg文件"><a href="#02、resource-cfg文件" class="headerlink" title="02、resource.cfg文件"></a>02、resource.cfg文件</h6><p>这个文件在前提已经提及，请回头查看</p>
+<h6 id="03、contacts-cfg文件"><a href="#03、contacts-cfg文件" class="headerlink" title="03、contacts.cfg文件"></a>03、contacts.cfg文件</h6><p>是用来定义联系人及联系人组的配置文件，当你要监控的服务出现异常，达到所设置的阈值，它就可以通过这边设置的联系人来发送邮件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">define contact&#123;</span><br><span class="line">        contact_name            qizai             #联系人的名称,这个地方不要有空格</span><br><span class="line">        use                     generic-contact   #引用generic-contact的属性信息，其中“generic-contact”在templates.cfg文件中进行定义</span><br><span class="line">        alias                   Nagios Admin</span><br><span class="line">        email                   qizai.niubi@alimama.cn</span><br><span class="line">        &#125;</span><br><span class="line">define contactgroup&#123;</span><br><span class="line">        contactgroup_name       nagios              #联系人组的名称,同样不能空格</span><br><span class="line">        alias                   nagios              #联系人组描述</span><br><span class="line">        members                 qizai               #联系人组成员，其中“qizai”就是上面定义的联系人，如果有多个联系人则以英文逗号相隔</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="04、timeperiods-cfg文件"><a href="#04、timeperiods-cfg文件" class="headerlink" title="04、timeperiods.cfg文件"></a>04、timeperiods.cfg文件</h6><p>这个是定义监控的时间段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#下面是定义一个名为24x7的时间段，即监控所有时间段  </span><br><span class="line">define timeperiod&#123;  </span><br><span class="line">        timeperiod_name 24x7       #时间段的名称,这个地方不要有空格</span><br><span class="line">        alias           24 Hours A Day, 7 Days A Week  </span><br><span class="line">        sunday          00:00-24:00  </span><br><span class="line">        monday          00:00-24:00  </span><br><span class="line">        tuesday         00:00-24:00  </span><br><span class="line">        wednesday       00:00-24:00  </span><br><span class="line">        thursday        00:00-24:00  </span><br><span class="line">        friday          00:00-24:00  </span><br><span class="line">        saturday        00:00-24:00  </span><br><span class="line">        &#125;  </span><br><span class="line">#下面是定义一个名为workhours的时间段，即工作时间段。  </span><br><span class="line">define timeperiod&#123;  </span><br><span class="line">        timeperiod_name workhours   </span><br><span class="line">        alias           Normal Work Hours  </span><br><span class="line">        monday          09:00-17:00  </span><br><span class="line">        tuesday         09:00-17:00  </span><br><span class="line">        wednesday       09:00-17:00  </span><br><span class="line">        thursday        09:00-17:00  </span><br><span class="line">        friday          09:00-17:00  </span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="05、cgi-cfg文件"><a href="#05、cgi-cfg文件" class="headerlink" title="05、cgi.cfg文件"></a>05、cgi.cfg文件</h6><p>此文件用来控制相关cgi脚本，如果想在nagios的web监控界面执行cgi脚本，例如重启nagios进程、关闭nagios通知、停止nagios主机检测等，这时就需要配置cgi.cfg文件了。由于nagios的web监控界面验证用户为chd，所以只需在cgi.cfg文件中添加此用户的执行权限就可以了，需要修改的配置信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">default_user_name=chd</span><br><span class="line">authorized_for_system_information=nagiosadmin,chd  </span><br><span class="line">authorized_for_configuration_information=nagiosadmin,chd  </span><br><span class="line">authorized_for_system_commands=chd</span><br><span class="line">authorized_for_all_services=nagiosadmin,chd  </span><br><span class="line">authorized_for_all_hosts=nagiosadmin,chd</span><br><span class="line">authorized_for_all_service_commands=nagiosadmin,chd  </span><br><span class="line">authorized_for_all_host_commands=nagiosadmin,chd</span><br></pre></td></tr></table></figure>
+<h6 id="06、host-51-cfg文件"><a href="#06、host-51-cfg文件" class="headerlink" title="06、host_51.cfg文件"></a>06、host_51.cfg文件</h6><p>这个host_51.cfg文件就是定义监控192.168.1.51主机，下面这些是我的配置文件跟原来的有所改动，里面有很多要注意的地方，我已经标了注释，请详细看看，==前面的配置文件还有个坑==，在这个配置文件里面已经补上了，看看你能不能找出来，==我最后再回头补上这个坑==（ ☺☺奸笑！！！哈哈哈，好了我不笑了，万一被打…）</p>
+<p>tips：从这个host_51.cfg配置的形式跟前面的.cfg的文件对比，你就可以发现！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br></pre></td><td class="code"><pre><span class="line">define host &#123;</span><br><span class="line">    use linux-server</span><br><span class="line">    host_name 192.168.1.51  ; 这里你使用name，前端nagios展示的就是啥名，而且这里的name是在后面的service用到的，请留意，骚不注意两行泪啊！！！</span><br><span class="line">    address   192.168.1.51</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define hostgroup &#123;</span><br><span class="line">    hostgroup_name 51_ganglia-servers   ; 这个name也是要在hostgroup中全局唯一的，而且也是在下面使用到</span><br><span class="line">    alias   nagios server</span><br><span class="line">    members 192.168.1.51                ; 这里的成员名字是上面host里面的host_name字段的值，如果是多个成员，记得使用英文逗号隔开</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">define servicegroup &#123;</span><br><span class="line">  servicegroup_name 51_ganglia-metrics  ; 这个name也是在servicegroup中是唯一的，且在后面使用到</span><br><span class="line">  alias Ganglia Metrics</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">define command &#123;</span><br><span class="line">  command_name 50_check_ganglia         ; 这个是扩展的脚本命令，暂时不用管</span><br><span class="line">  command_line python2 $USER1$/check_ganglia.py -h $HOSTNAME$ -m $ARG1$ -w $ARG2$ -c $ARG3$ -o $ARG4$</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use generic-service                ; 这个use字段来源于模板templates.cfg里面的，一般引用即可</span><br><span class="line">    name 51_ganglia-service            ; 这个name是在service中要全局唯一，且在下面的每一个service里面使用到，所以这里是什么name，下面的就是要use 这个name，不然前端页面是看不到下面那些配置的service的，记得！！巨坑，两行泪啊！</span><br><span class="line">    hostgroup_name 51_ganglia-servers ;这个name是前面的hostgroup里面的</span><br><span class="line">    service_groups 51_ganglia-metrics  ; 这个也是前面对应的</span><br><span class="line">    notifications_enabled 1            ; 这个是表示是否发送警报，1表示发送，0表示不发送</span><br><span class="line">    notification_interval 10           ; 这个表示重新发送警报的时间间隔</span><br><span class="line">    register  0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">define service&#123;</span><br><span class="line">    use                     51_ganglia-service</span><br><span class="line">    service_description     内存状态</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数，这个时间单位在timeperiods.cfg里面定义的，好像默认是分钟</span><br><span class="line">    normal_check_interval   3                       ; 这个是正常检测的时间间隔（指没有出现异常的情况）</span><br><span class="line">    retry_check_interval    2                       ;这个是出现问题之后，重新尝试的时间间隔</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   30                      ;这个是重新发送警报的时间间隔</span><br><span class="line">    notification_period     24x7                    ; 发送警报的时间段</span><br><span class="line">    notification_options    w,u,c,r                 ;发送警报的类型.warming警告、unknown不可达/未知、critical致命错误、recovery恢复正常</span><br><span class="line"></span><br><span class="line">    check_command           check_mem!90!90         ;执行脚本的命令，及其相关的参数第一个90表示warming，第二个90表示critical等级</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service&#123;</span><br><span class="line">    ;use                     ganglia-service           ; Name of service template to use</span><br><span class="line">    use                     51_ganglia-service</span><br><span class="line">    service_description     根分区</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   360</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_local_disk!15%!10%!/</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service&#123;</span><br><span class="line">    ;use                     ganglia-service   这里的use使用模板就是指当前文件的模板，去前面service找</span><br><span class="line">    use                     51_ganglia-service</span><br><span class="line">    service_description     系统负载</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   20</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_local_load!15,10,5!30,25,20</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service</span><br><span class="line">    service_description     主机是否运行中          ; 服务描述</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   10</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check-host-alive!3000,80%!5000,100%</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     PING</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   30</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_ping!100.0,60%!500.0,80%   ;设定ping包平均时长100ms，丢包率为60%触发w告警；ping包平均响应时长为500ms，触发c告警</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     当前用户</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   120</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_local_users!20!50</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     Total Processes</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   30</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_local_procs!250!400!RSZDT</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     Swap Usage</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数</span><br><span class="line">    normal_check_interval   3</span><br><span class="line">    retry_check_interval    2</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   30</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_local_swap!15%!10%</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     HTTP</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数，达到之后即发送警报</span><br><span class="line">    normal_check_interval   3                       ; 正常监测时间间隔</span><br><span class="line">    retry_check_interval    2                       ; 异常重试时间间隔</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   0                     ; 发送警报时间间隔,单位为分钟</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_http</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     nginx</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数，达到之后即发送警报</span><br><span class="line">    normal_check_interval   3                       ; 正常监测时间间隔</span><br><span class="line">    retry_check_interval    2                       ; 异常重试时间间隔</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   0                       ; 发送警报时间间隔,单位为分钟,为0表示仅仅发送一次</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_procs_nginx</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">define service &#123;</span><br><span class="line">    use                     51_ganglia-service           ; Name of service template to use</span><br><span class="line">    service_description     mysql</span><br><span class="line">    check_period            24x7                    ; 检测的时间段</span><br><span class="line">    max_check_attempts      3                       ; 最大检测次数，达到之后即发送警报</span><br><span class="line">    normal_check_interval   3                       ; 正常监测时间间隔</span><br><span class="line">    retry_check_interval    2                       ; 异常重试时间间隔</span><br><span class="line">    contact_groups          admins                  ; 发生故障通知的联系人组</span><br><span class="line">    notification_interval   0                       ; 发送警报时间间隔,单位为分钟,为0表示仅仅发送一次</span><br><span class="line">    notification_period     24x7                    ; 通知的时间段</span><br><span class="line">    notification_options    w,u,c,r</span><br><span class="line"></span><br><span class="line">    check_command           check_procs_mysql</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="注意：在-usr-local-nagios-etc-objects-下默认有localhost-cfg-和windows-cfg-这两个配置文件，localhost-cfg-文件是定义监控主机本身的，windows-cfg-文件是定义windows-主机的，其中包括了对host-和相关services-的定义。所以在本次实验中，将直接在localhost-cfg-中定义监控主机（Nagios-Server），在windows-cfg中定义windows-主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下："><a href="#注意：在-usr-local-nagios-etc-objects-下默认有localhost-cfg-和windows-cfg-这两个配置文件，localhost-cfg-文件是定义监控主机本身的，windows-cfg-文件是定义windows-主机的，其中包括了对host-和相关services-的定义。所以在本次实验中，将直接在localhost-cfg-中定义监控主机（Nagios-Server），在windows-cfg中定义windows-主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下：" class="headerlink" title="注意：在/usr/local/nagios/etc/objects 下默认有localhost.cfg 和windows.cfg 这两个配置文件，localhost.cfg 文件是定义监控主机本身的，windows.cfg 文件是定义windows 主机的，其中包括了对host 和相关services 的定义。所以在本次实验中，将直接在localhost.cfg 中定义监控主机（Nagios-Server），在windows.cfg中定义windows 主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下："></a>注意：在/usr/local/nagios/etc/objects 下默认有localhost.cfg 和windows.cfg 这两个配置文件，localhost.cfg 文件是定义监控主机本身的，windows.cfg 文件是定义windows 主机的，其中包括了对host 和相关services 的定义。所以在本次实验中，将直接在localhost.cfg 中定义监控主机（Nagios-Server），在windows.cfg中定义windows 主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下：</h6><h6 id="原来的localhost-cfg内容如下："><a href="#原来的localhost-cfg内容如下：" class="headerlink" title="原来的localhost.cfg内容如下："></a>原来的localhost.cfg内容如下：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">define host&#123;</span><br><span class="line">        use                     linux-server            ; Name of host template to use</span><br><span class="line">                                                        ; This host definition will inherit all variables that are defined</span><br><span class="line">                                                        ; in (or inherited by) the linux-server host template definition.</span><br><span class="line">        host_name               Nagios-Server</span><br><span class="line">        alias                   Nagios-Server</span><br><span class="line">        address                 127.0.0.1</span><br><span class="line">        &#125;</span><br><span class="line">define hostgroup&#123;</span><br><span class="line">        hostgroup_name  linux-servers ; The name of the hostgroup</span><br><span class="line">        alias           Linux Servers ; Long name of the group</span><br><span class="line">        members         Nagios-Server ; Comma separated list of hosts that belong to this group</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             PING</span><br><span class="line">        check_command                   check_ping!100.0,20%!500.0,60%</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             Root Partition</span><br><span class="line">        check_command                   check_local_disk!20%!10%!/</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             Current Users</span><br><span class="line">        check_command                   check_local_users!20!50</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             Total Processes</span><br><span class="line">        check_command                   check_local_procs!250!400!RSZDT</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             Current Load</span><br><span class="line">        check_command                   check_local_load!5.0,4.0,3.0!10.0,6.0,4.0</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             Swap Usage</span><br><span class="line">        check_command                   check_local_swap!20!10</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             SSH</span><br><span class="line">        check_command                   check_ssh</span><br><span class="line">        notifications_enabled           0</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                             local-service         ; Name of service template to use</span><br><span class="line">        host_name                       Nagios-Server</span><br><span class="line">        service_description             HTTP</span><br><span class="line">        check_command                   check_http</span><br><span class="line">        notifications_enabled           0</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="windows-cfg-文件内容："><a href="#windows-cfg-文件内容：" class="headerlink" title="windows.cfg 文件内容："></a>windows.cfg 文件内容：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">define host&#123;</span><br><span class="line">        use             windows-server  ; Inherit default values from a template</span><br><span class="line">        host_name       Nagios-Windows  ; The name we&apos;re giving to this host</span><br><span class="line">        alias           My Windows Server       ; A longer name associated with the host</span><br><span class="line">        address         192.168.1.113   ; IP address of the host</span><br><span class="line">        &#125;</span><br><span class="line">define hostgroup&#123;</span><br><span class="line">        hostgroup_name  windows-servers ; The name of the hostgroup</span><br><span class="line">        alias           Windows Servers ; Long name of the group</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     NSClient++ Version</span><br><span class="line">        check_command           check_nt!CLIENTVERSION</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     Uptime</span><br><span class="line">        check_command           check_nt!UPTIME</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     CPU Load</span><br><span class="line">        check_command           check_nt!CPULOAD!-l 5,80,90</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     Memory Usage</span><br><span class="line">        check_command           check_nt!MEMUSE!-w 80 -c 90</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     C:\ Drive Space</span><br><span class="line">        check_command           check_nt!USEDDISKSPACE!-l c -w 80 -c 90</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     W3SVC</span><br><span class="line">        check_command           check_nt!SERVICESTATE!-d SHOWALL -l W3SVC</span><br><span class="line">        &#125;</span><br><span class="line">define service&#123;</span><br><span class="line">        use                     generic-service</span><br><span class="line">        host_name               Nagios-Windows</span><br><span class="line">        service_description     Explorer</span><br><span class="line">        check_command           check_nt!PROCSTATE!-d SHOWALL -l Explorer.exe</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h6 id="08、services-cfg文件"><a href="#08、services-cfg文件" class="headerlink" title="08、services.cfg文件"></a>08、services.cfg文件</h6><p>此文件默认也不存在，需要手动创建，services_50.cfg文件主要用于定义监控的服务和主机资源，例如监控http服务、ftp服务、主机磁盘空间、主机系统负载等等。Nagios-Server 和Nagios-Windows 相关服务已在相应的配置文件中定义，所以这里只需要定义Nagios-Linux 相关服务即可，这里只定义一个检测是否存活的服务来验证配置文件的正确性，其他服务的定义将在后面讲到。</p>
+<h5 id="但是，这里的services-cfg我是没有创建的，因为我的host-51-cfg文件就已经包含那些服务了，所以我这里不创建这个文件了"><a href="#但是，这里的services-cfg我是没有创建的，因为我的host-51-cfg文件就已经包含那些服务了，所以我这里不创建这个文件了" class="headerlink" title="但是，这里的services.cfg我是没有创建的，因为我的host_51.cfg文件就已经包含那些服务了，所以我这里不创建这个文件了"></a>但是，这里的services.cfg我是没有创建的，因为我的host_51.cfg文件就已经包含那些服务了，所以我这里不创建这个文件了</h5><h6 id="09、nagios-cfg文件"><a href="#09、nagios-cfg文件" class="headerlink" title="09、nagios.cfg文件"></a>09、nagios.cfg文件</h6><p>nagios.cfg默认的路径为/usr/local/nagios/etc/nagios.cfg，是nagios的核心配置文件，所有的对象配置文件都必须在这个文件中进行定义才能发挥其作用，这里只需将对象配置文件在Nagios.cfg文件中进行引用即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">log_file=/usr/local/nagios/var/nagios.log                  # 定义nagios日志文件的路径</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/commands.cfg        # “cfg_file”变量用来引用对象配置文件，如果有更多的对象配置文件，在这里依次添加即可。</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/contacts.cfg</span><br><span class="line">#cfg_file=/usr/local/nagios/etc/objects/services.cfg</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/timeperiods.cfg</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/templates.cfg</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/windows.cfg         # windows 主机配置文件</span><br><span class="line">#cfg_file=/usr/local/nagios/etc/objects/localhost.cfg</span><br><span class="line"></span><br><span class="line"># 下面这个就是我们配置的监控的主机</span><br><span class="line">cfg_file=/usr/local/nagios/etc/objects/host_51.cfg</span><br><span class="line"></span><br><span class="line">object_cache_file=/usr/local/nagios/var/objects.cache      # 该变量用于指定一个“所有对象配置文件”的副本文件，或者叫对象缓冲文件</span><br><span class="line">precached_object_file=/usr/local/nagios/var/objects.precache</span><br><span class="line">resource_file=/usr/local/nagios/etc/resource.cfg           # 该变量用于指定nagios资源文件的路径，可以在nagios.cfg中定义多个资源文件。</span><br><span class="line">status_file=/usr/local/nagios/var/status.dat               # 该变量用于定义一个状态文件，此文件用于保存nagios的当前状态、注释和宕机信息等。</span><br><span class="line">status_update_interval=10                                  # 该变量用于定义状态文件（即status.dat）的更新时间间隔，单位是秒，最小更新间隔是1秒。</span><br><span class="line">nagios_user=nagios                                         # 该变量指定了Nagios进程使用哪个用户运行。</span><br><span class="line">nagios_group=nagios                                        # 该变量用于指定Nagios使用哪个用户组运行。</span><br><span class="line">check_external_commands=1                                  # 该变量用于设置是否允许nagios在web监控界面运行cgi命令;</span><br><span class="line">                                                           # 也就是是否允许nagios在web界面下执行重启nagios、停止主机/服务检查等操作;</span><br><span class="line">                                                           # “1”为运行，“0”为不允许。</span><br><span class="line">command_check_interval=10s                                 # 该变量用于设置nagios对外部命令检测的时间间隔，如果指定了一个数字加一个&quot;s&quot;(如10s);</span><br><span class="line">                                                           # 那么外部检测命令的间隔是这个数值以秒为单位的时间间隔;</span><br><span class="line">                                                           # 如果没有用&quot;s&quot;，那么外部检测命令的间隔是以这个数值的“时间单位”的时间间隔。</span><br><span class="line">interval_length=60                                         # 该变量指定了nagios的时间单位，默认值是60秒，也就是1分钟;</span><br><span class="line">                                                           # 即在nagios配置中所有的时间单位都是分钟。</span><br></pre></td></tr></table></figure>
+<h5 id="0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确"><a href="#0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确" class="headerlink" title="0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确"></a>0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确</h5><p>检验的正确性的命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg</span><br></pre></td></tr></table></figure>
+<p>当你看到下面的输出的时候:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">Nagios Core 4.4.3</span><br><span class="line">Copyright (c) 2009-present Nagios Core Development Team and Community Contributors</span><br><span class="line">Copyright (c) 1999-2009 Ethan Galstad</span><br><span class="line">Last Modified: 2019-01-15</span><br><span class="line">License: GPL</span><br><span class="line"></span><br><span class="line">Website: https://www.nagios.org</span><br><span class="line">Reading configuration data...</span><br><span class="line">   Read main config file okay...</span><br><span class="line">WARNING: The normal_check_interval attribute is deprecated and will be removed in future versions. Please use check_interval instead.</span><br><span class="line"></span><br><span class="line">........</span><br><span class="line">省略中间一大部分</span><br><span class="line">........</span><br><span class="line"></span><br><span class="line">Running pre-flight check on configuration data...</span><br><span class="line"></span><br><span class="line">Checking objects...</span><br><span class="line">	Checked 20 services.</span><br><span class="line">	Checked 2 hosts.</span><br><span class="line">	Checked 2 host groups.</span><br><span class="line">	Checked 2 service groups.</span><br><span class="line">	Checked 1 contacts.</span><br><span class="line">	Checked 1 contact groups.</span><br><span class="line">	Checked 38 commands.</span><br><span class="line">	Checked 5 time periods.</span><br><span class="line">	Checked 0 host escalations.</span><br><span class="line">	Checked 0 service escalations.</span><br><span class="line">Checking for circular paths...</span><br><span class="line">	Checked 2 hosts</span><br><span class="line">	Checked 0 service dependencies</span><br><span class="line">	Checked 0 host dependencies</span><br><span class="line">	Checked 5 timeperiods</span><br><span class="line">Checking global event handlers...</span><br><span class="line">Checking obsessive compulsive processor commands...</span><br><span class="line">Checking misc settings...</span><br><span class="line"></span><br><span class="line">Total Warnings: 0</span><br><span class="line">Total Errors:   0</span><br><span class="line"></span><br><span class="line">Things look okay - No serious problems were detected during the pre-flight check</span><br></pre></td></tr></table></figure>
+<p>睁大眼睛啦，上面中，最重要的是这两句(0:warming；0:error)，才是正确的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Total Warnings: 0</span><br><span class="line">Total Errors:   0</span><br></pre></td></tr></table></figure>
+<p>如果你看到有报错，那也不用慌，看他提示的报错信息来，经过我个人的踩坑，发现提示的错误信息包括有：重复定义(host组名、service组名)、service找不到，如果你按照我前面提示的去配置，这里就不会出现这种问题了，不过难免第一次会踩坑，多踩人生才精彩！！！</p>
+<p>目前截图保留的报错如下：<br><img src="https://img-blog.csdnimg.cn/20190816172653355.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="报错信息"></p>
+<h5 id="0x07、启动与停止"><a href="#0x07、启动与停止" class="headerlink" title="0x07、启动与停止"></a>0x07、启动与停止</h5><p>简单粗暴的shell通过脚本来启动与停止(这样不知道好不好，反正是挺方便的，哈哈哈)</p>
+<h6 id="启动："><a href="#启动：" class="headerlink" title="**启动："></a>**启动：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line">#sudo /etc/init.d/gmetad restart  # 可以忽略这几个</span><br><span class="line">#sudo /etc/init.d/ganglia-monitor restart</span><br><span class="line">#sudo /etc/init.d/apache2 restart</span><br><span class="line">sudo service nagios restart</span><br><span class="line">sudo service sendmail restart</span><br></pre></td></tr></table></figure>
+<p>启动之后，如果你的配置是错误的话，那么前端页面看到的结果是:<br><img src="https://img-blog.csdnimg.cn/20190816172824501.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="配置错误导致启动不了"></p>
+<h6 id="停止："><a href="#停止：" class="headerlink" title="**停止："></a>**停止：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line">sudo service nagios stop</span><br><span class="line">sudo service sendmail stop</span><br></pre></td></tr></table></figure>
+<h6 id="也可以通过nagios页面来启动和停止："><a href="#也可以通过nagios页面来启动和停止：" class="headerlink" title="**也可以通过nagios页面来启动和停止："></a>**也可以通过nagios页面来启动和停止：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">通过web监控页的&quot;Process Info&quot; -&gt; &quot;Restart the Nagios process&quot;来重启nagios</span><br><span class="line">通过web监控页的&quot;Process Info&quot; -&gt; &quot;Shutdown the Nagios process&quot;来停止nagios</span><br></pre></td></tr></table></figure>
+<p>正常启动之后，可以通过界面来重启等，如下:<br>   <img src="https://img-blog.csdnimg.cn/20190815221815350.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="nagios-web端重启、启动"></p>
+<h5 id="0x08、查看配置成果"><a href="#0x08、查看配置成果" class="headerlink" title="0x08、查看配置成果"></a>0x08、查看配置成果</h5><h6 id="Tips：我这里是做了端口映射，你们要对应的修改一下"><a href="#Tips：我这里是做了端口映射，你们要对应的修改一下" class="headerlink" title="Tips：我这里是做了端口映射，你们要对应的修改一下"></a>Tips：我这里是做了端口映射，你们要对应的修改一下</h6><p>启动完成之后，可以通过浏览器登录Nagios Web监控页，账号密码就是前边配置的账号密码，我前边配置的账号密码都是nagios</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.1.51:8888/nagios/</span><br><span class="line"># http://你的ip:你的端口/nagios/</span><br></pre></td></tr></table></figure>
+<p>然后查看相关信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">点击左面的Current Status -&gt; Hosts 可以看到所定义的主机</span><br><span class="line">点击左面的Current Status -&gt; Services 可以看到对应主机的服务</span><br></pre></td></tr></table></figure>
+<p>图片如下:<br><img src="https://img-blog.csdnimg.cn/20190815221607919.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="查看nagios配置的主机情况"></p>
+<p><img src="https://img-blog.csdnimg.cn/20190816173324387.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="查看配置的services配置情况"></p>
+<h5 id="必杀技来了，看好了！！！"><a href="#必杀技来了，看好了！！！" class="headerlink" title="必杀技来了，看好了！！！"></a>必杀技来了，看好了！！！</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">前面提到的坑就是，在host_51.cfg这种.cfg文件当中，</span><br><span class="line">记得注释的时候是使用英文的分号;来注释，</span><br><span class="line">并不能使用井号#来注释，经过亲身经历之后，</span><br><span class="line">发现英文的分号注释是没有问题的！！</span><br><span class="line">谨记啊！！！真的很痛苦，检查了很多遍，配置很多遍，才能通过。</span><br><span class="line">希望你们看到这段话的同时不要恨我、别喷我，你目前只有回头修改，溜了溜了....</span><br></pre></td></tr></table></figure>
+<p>至此，nagios配置本机的监控完毕，上面的记录当中可能有些不完整，因为我是配置好了之后，过了一段时间才从新写下来记录的，如有不妥的地方欢迎各位大佬指正，感谢！</p>
+<h5 id="本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗"><a href="#本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗"></a>本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗</h5><h5 id="感谢认真读完的这篇教程的您"><a href="#感谢认真读完的这篇教程的您" class="headerlink" title="感谢认真读完的这篇教程的您"></a>感谢认真读完的这篇教程的您</h5><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/100056870" target="_blank" rel="noopener">运维必备:ganglia集群监控服务端及客户端配置实战</a>；</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
+              <a href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag"># 监控</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/08/10/download-ubuntu/" rel="next" title="ubuntu系统下载路径(可以收藏免得以后再找)">
+                  <i class="fa fa-chevron-left"></i> ubuntu系统下载路径(可以收藏免得以后再找)
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/08/26/crack-woff/" rel="prev" title="woff字体反爬实战，10分钟就能学会(ttf字体同理)">
+                  woff字体反爬实战，10分钟就能学会(ttf字体同理) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#0x00、前言"><span class="nav-number">1.</span> <span class="nav-text">0x00、前言</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）"><span class="nav-number">2.</span> <span class="nav-text">至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x01、依赖环境"><span class="nav-number">3.</span> <span class="nav-text">0x01、依赖环境</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x02、安装文件路径"><span class="nav-number">4.</span> <span class="nav-text">0x02、安装文件路径</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！"><span class="nav-number">4.1.</span> <span class="nav-text">tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x03、配置文件提到的概念"><span class="nav-number">5.</span> <span class="nav-text">0x03、配置文件提到的概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x04、下面来打个预防针———屡一下配置的思路"><span class="nav-number">6.</span> <span class="nav-text">0x04、下面来打个预防针———屡一下配置的思路</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#配置过程大致分为以下四步："><span class="nav-number">6.1.</span> <span class="nav-text">配置过程大致分为以下四步：</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x05、开始配置旅程"><span class="nav-number">7.</span> <span class="nav-text">0x05、开始配置旅程</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护"><span class="nav-number">7.1.</span> <span class="nav-text">tips：还是强调一下，最好是一个主机配置一个文件，以便以后好维护</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#00、templates-cfg里面内容参数说明如下："><span class="nav-number">7.2.</span> <span class="nav-text">00、templates.cfg里面内容参数说明如下：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#01、commands-cfg文件"><span class="nav-number">7.3.</span> <span class="nav-text">01、commands.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#02、resource-cfg文件"><span class="nav-number">7.4.</span> <span class="nav-text">02、resource.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#03、contacts-cfg文件"><span class="nav-number">7.5.</span> <span class="nav-text">03、contacts.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#04、timeperiods-cfg文件"><span class="nav-number">7.6.</span> <span class="nav-text">04、timeperiods.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#05、cgi-cfg文件"><span class="nav-number">7.7.</span> <span class="nav-text">05、cgi.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#06、host-51-cfg文件"><span class="nav-number">7.8.</span> <span class="nav-text">06、host_51.cfg文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#注意：在-usr-local-nagios-etc-objects-下默认有localhost-cfg-和windows-cfg-这两个配置文件，localhost-cfg-文件是定义监控主机本身的，windows-cfg-文件是定义windows-主机的，其中包括了对host-和相关services-的定义。所以在本次实验中，将直接在localhost-cfg-中定义监控主机（Nagios-Server），在windows-cfg中定义windows-主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下："><span class="nav-number">7.9.</span> <span class="nav-text">注意：在/usr/local/nagios/etc/objects 下默认有localhost.cfg 和windows.cfg 这两个配置文件，localhost.cfg 文件是定义监控主机本身的，windows.cfg 文件是定义windows 主机的，其中包括了对host 和相关services 的定义。所以在本次实验中，将直接在localhost.cfg 中定义监控主机（Nagios-Server），在windows.cfg中定义windows 主机（Nagios-Windows）。根据自己的需要修改其中的相关配置，详细如下：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#原来的localhost-cfg内容如下："><span class="nav-number">7.10.</span> <span class="nav-text">原来的localhost.cfg内容如下：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#windows-cfg-文件内容："><span class="nav-number">7.11.</span> <span class="nav-text">windows.cfg 文件内容：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#08、services-cfg文件"><span class="nav-number">7.12.</span> <span class="nav-text">08、services.cfg文件</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#但是，这里的services-cfg我是没有创建的，因为我的host-51-cfg文件就已经包含那些服务了，所以我这里不创建这个文件了"><span class="nav-number">8.</span> <span class="nav-text">但是，这里的services.cfg我是没有创建的，因为我的host_51.cfg文件就已经包含那些服务了，所以我这里不创建这个文件了</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#09、nagios-cfg文件"><span class="nav-number">8.1.</span> <span class="nav-text">09、nagios.cfg文件</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确"><span class="nav-number">9.</span> <span class="nav-text">0x06、至此配置首先完成一部分，下面来检验一下这些配置是否正确</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x07、启动与停止"><span class="nav-number">10.</span> <span class="nav-text">0x07、启动与停止</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#启动："><span class="nav-number">10.1.</span> <span class="nav-text">**启动：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#停止："><span class="nav-number">10.2.</span> <span class="nav-text">**停止：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#也可以通过nagios页面来启动和停止："><span class="nav-number">10.3.</span> <span class="nav-text">**也可以通过nagios页面来启动和停止：</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x08、查看配置成果"><span class="nav-number">11.</span> <span class="nav-text">0x08、查看配置成果</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Tips：我这里是做了端口映射，你们要对应的修改一下"><span class="nav-number">11.1.</span> <span class="nav-text">Tips：我这里是做了端口映射，你们要对应的修改一下</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#必杀技来了，看好了！！！"><span class="nav-number">12.</span> <span class="nav-text">必杀技来了，看好了！！！</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗"><span class="nav-number">13.</span> <span class="nav-text">本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#感谢认真读完的这篇教程的您"><span class="nav-number">14.</span> <span class="nav-text">感谢认真读完的这篇教程的您</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="qizai"
+      src="/images/qizai.png">
+  <p class="site-author-name" itemprop="name">qizai</p>
+  <div class="site-description" itemprop="description">目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qizai</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.5.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      element.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '44618db3409b8e2ef4db',
+      clientSecret: '61a79fe046604cf8e5be252a5b8a2b9384c0609f',
+      repo: 'qqizai.github.io',
+      owner: 'qqizai',
+      admin: ['qqizai'],
+      id: '9692b6fc16c75001e81c462f42640a2b',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+    </div>
+</body>
+</html>
