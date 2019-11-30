@@ -208,8 +208,115 @@
       </tags>
   </entry>
   <entry>
+    <title>运维必备:ganglia集群监控服务端及客户端配置实战</title>
+    <url>/2019/06/17/ganglia/</url>
+    <content><![CDATA[<h5 id="0x01、前言"><a href="#0x01、前言" class="headerlink" title="0x01、前言"></a>0x01、前言</h5><blockquote>
+<p>Ganglia是UC Berkeley发起的一个开源集群监视项目，设计用于测量数以千计的节点。Ganglia的核心包含gmond、gmetad以及一个Web前端。主要是用来监控系统性能，如：cpu 、mem、硬盘利用率，I/O负载、网络流量情况等，通过曲线很容易见到每个节点的工作状态，对合理调整、分配系统资源，提高系统整体性能起到重要作用。</p>
+</blockquote><a id="more"></a>
+<p>ganglia还是很受欢迎的一个集群监控软件，能够在短短几秒之内就能知道数以千计的服务器运行状态，是一个企业监控/管理的软件，下面一起来看看如何配置服务器及客户端节点。</p>
+<h6 id="1、在这里，本文介绍配置的监控节点如下："><a href="#1、在这里，本文介绍配置的监控节点如下：" class="headerlink" title="1、在这里，本文介绍配置的监控节点如下："></a>1、在这里，本文介绍配置的监控节点如下：</h6><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>服务名称</th>
+<th>节点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务端</td>
+<td>10.1.1.51</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>10.1.1.50</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>10.1.1.251</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>注意：服务端只能有一个，客户端可以有很多个，并且服务端是需要安装gmated的，如果你服务端也要监控它的运行状态的话，那么也要装上gmond；客户端只需要安装gmond就可以了。</p>
+<blockquote>
+<p>在这里本文不介绍如何安装ganglia，只介绍配置服务端和客户端，如果你需要安装的步骤请自行搜索，敬请谅解。</p>
+</blockquote>
+<h5 id="0x0x2、服务端配置-10-1-1-51"><a href="#0x0x2、服务端配置-10-1-1-51" class="headerlink" title="0x0x2、服务端配置(10.1.1.51)"></a>0x0x2、服务端配置(10.1.1.51)</h5><ol>
+<li>修改gmetad.conf文件，修改两个地方，一个是设置集群的名字及监控的客户端ip、端口；另外一个是设置信任的主机，相当于设置白名单。</li>
+</ol>
+<blockquote>
+<p>vim /etc/ganglia/gemtad.conf  # 这个路径可能不一样，你需要找一下这个gmetad.conf文件在哪</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#data_source &quot;my cluster&quot; localhost   # 这个是默认的</span><br><span class="line">data_source &quot;my cluster&quot; 10 10.1.1.51:8649 10.1.1.1.251:8649 10.1.1.50:8649   # 前面第一个是“my **”是集群名称，后面是需要监控的客户端的ip地址</span><br><span class="line"></span><br><span class="line"># trusted_hosts 127.0.0.1 169.229.50.165 my.gmetad.org  # 这个是默认的</span><br><span class="line">trusted_hosts 127.0.0.1 10.1.1.51 10.1.1.251 10.1.1.50  # 添加这些信任的客户端ip</span><br></pre></td></tr></table></figure>
+<ol>
+<li>修改ganglia.conf，这个文件路径同样也是你需要查找一下，可能路径不太一样，后面将不再提醒这个路径问题</li>
+</ol>
+<blockquote>
+<p>可能你们的需要注意复制才行： sudo cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ganglia.conf（很关键的一步）<br>vim /etc/apache2/sites-enabled/ganglia.conf<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Alias /ganglia /usr/share/ganglia-webfrontend</span><br><span class="line">  </span><br><span class="line">&lt;Directory &quot;/usr/share/ganglia-webfrontend&quot;&gt;</span><br><span class="line">        AllowOverride All</span><br><span class="line">        Order allow,deny</span><br><span class="line">        Allow from all</span><br><span class="line">        Deny from none</span><br><span class="line">&lt;/Directory&gt;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h6 id="0x03、客户端配置-10-1-1-51、10-1-1-50、10-1-1-251"><a href="#0x03、客户端配置-10-1-1-51、10-1-1-50、10-1-1-251" class="headerlink" title="0x03、客户端配置(10.1.1.51、10.1.1.50、10.1.1.251)"></a>0x03、客户端配置(10.1.1.51、10.1.1.50、10.1.1.251)</h6><p>需要注意的是，客户端在Ubuntu和CentOS上是不同的包名：<br>==Ubuntu 是安装 Ganglia-monitor==；==CentOS 是安装ganglia-gmond==</p>
+<ol>
+<li>配置客户端10.1.1.51、10.1.1.50、10.1.1.251，gmond.conf</li>
+</ol>
+<blockquote>
+<p>vim /etc/ganglia/gmond.conf<br>修改以下内容：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">globals &#123;</span><br><span class="line">  daemonize = yes</span><br><span class="line">  setuid = yes</span><br><span class="line">  user = ganglia</span><br><span class="line">  debug_level = 0</span><br><span class="line">  max_udp_msg_len = 1472</span><br><span class="line">  mute = no</span><br><span class="line">  deaf = no</span><br><span class="line">  host_dmax = 604800 /*secs 超过这个秒数未汇报数据，那么节点则会被清除掉,86400为一天，这里配置的是7天*/</span><br><span class="line">  cleanup_threshold = 60 /*secs 原来是300,这里修改为60是为了更新及时 */</span><br><span class="line">  gexec = no</span><br><span class="line">  send_metadata_interval = 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cluster &#123;</span><br><span class="line">  #name = &quot;unspecified&quot;  </span><br><span class="line">  name = &quot;my cluster&quot;  # cluster名称就是在gmetad.conf里配置的data_source名称</span><br><span class="line">  owner = &quot;unspecified&quot;</span><br><span class="line">  latlong = &quot;unspecified&quot;</span><br><span class="line">  url = &quot;unspecified&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">udp_send_channel &#123; </span><br><span class="line">  #mcast_join = 239.2.11.71</span><br><span class="line">  host = 10.1.1.51  # 填写服务器端ip地址，表示当前的客户端发送udp报文给谁</span><br><span class="line">  port = 8649</span><br><span class="line">  ttl = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* You can specify as many udp_recv_channels as you like as well. */</span><br><span class="line">udp_recv_channel &#123;</span><br><span class="line">  #mcast_join = 239.2.11.71</span><br><span class="line">  port = 8649</span><br><span class="line">  #bind = 239.2.11.71</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，基础的监控功能的服务端、客户端配置完成，下面来看一下成果</p>
+<h6 id="0x04、查看ganglia-web，监控数据"><a href="#0x04、查看ganglia-web，监控数据" class="headerlink" title="0x04、查看ganglia-web，监控数据"></a>0x04、查看ganglia-web，监控数据</h6><p>打开:<a href="http://10.1.1.51:8088/ganglia" target="_blank" rel="noopener">http://10.1.1.51:8088/ganglia</a>即可看到监控的数据，如下：<br><img src="https://img-blog.csdnimg.cn/2019082422154586.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="ganglia-web集群"><br>可以看到在服务端设置的默认集群名字：my cluster<br>至于节点名字显示问题，已经在上图中介绍了，请注意留看</p>
+<p>先来随便看一个节点的数据，下面展示的是50节点的数据：<br><img src="https://img-blog.csdnimg.cn/20190824222201666.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="50节点的监控数据"><br>来看看负载情况，这个是ganglia默认监控的数据，可以看出这个软件有多方便，自带好一些监控的服务<br><img src="https://img-blog.csdnimg.cn/2019082422241283.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="负载情况"><br>至此，基础的ganglia监控数据已经配置完毕，下面我们来设置一些额外的监控，比如监控cpu温度。</p>
+<h6 id="0x05、使用Python自定义扩展ganglia插件"><a href="#0x05、使用Python自定义扩展ganglia插件" class="headerlink" title="0x05、使用Python自定义扩展ganglia插件"></a>0x05、使用Python自定义扩展ganglia插件</h6><p>这里只是介绍最简单的自定义插件扩展，监控CPU的温度，本教程使用的插件是来源于ganglia官网的插件，如需下载插件，<a href="https://github.com/ganglia/gmond_python_modules" target="_blank" rel="noopener">请右键点击这里进行下载</a></p>
+<p>这个插件资源包含很多监控服务的了，能满足所有的企业的基本监控需求，可以多尝试自定义去扩展监控服务</p>
+<ol>
+<li>首先去客户端节点配置</li>
+</ol>
+<p>请确保gmond.conf文件里面存在这一行配置，下面这个路径就是用来自定义扩展插件的：</p>
+<blockquote>
+<p>vim /etc/ganglia/gmond.conf<br>include (‘/etc/ganglia/conf.d/*.conf’)  </p>
+</blockquote>
+<p>然后创建目录conf.d，这个目录默认是不存在的</p>
+<blockquote>
+<p>mkdir /etc/ganglia/conf.d</p>
+</blockquote>
+<p>切换到conf.d目录下，创建自定义的python扩展插件的配置文件：modpython.conf</p>
+<blockquote>
+<p>cd /etc/ganglia/conf.d<br>touch modpython.conf</p>
+</blockquote>
+<p>然后保存以下内容：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">modules &#123;</span><br><span class="line">  module &#123;</span><br><span class="line">    name = &quot;python_module&quot;</span><br><span class="line">    path = &quot;/usr/lib/ganglia/modpython.so&quot;</span><br><span class="line">    params=&quot;/etc/ganglia/python_modules&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">include(&quot;/etc/ganglia/conf.d/*.pyconf&quot;)</span><br></pre></td></tr></table></figure><br>然后上传刚刚下载的资源里面，cpu_temp/conf.d/cpu_temp.pyconf，将cpu_temp.pyconf上传</p>
+<blockquote>
+<p>rz -y    # 弹出窗口之后，选择cpu_temp.pyconf文件上传</p>
+</blockquote>
+<p>然后在/etc/ganglia/目录下创建目录python_modules，并且上传cpu_temp/python_modules/cpu_temp.py，上传cpu_temp.py脚本</p>
+<blockquote>
+<p>mkdir /etc/ganglia/python_modules<br>cd /etc/ganglia/python_modules<br>rz -y  # 弹出窗口之后，选择cpu_temp.py文件上传</p>
+</blockquote>
+<h6 id="至此，自定义扩展算完成了100-，也可以说完成了90-，为什么呢，因为脚本cpu-temp-py不是一定能够运行成功的，每个人的服务器的cpu温度缓存文件路径不一定都是一样的，首先我们来检查一下脚本能否正常启动读取数据："><a href="#至此，自定义扩展算完成了100-，也可以说完成了90-，为什么呢，因为脚本cpu-temp-py不是一定能够运行成功的，每个人的服务器的cpu温度缓存文件路径不一定都是一样的，首先我们来检查一下脚本能否正常启动读取数据：" class="headerlink" title="至此，自定义扩展算完成了100%，也可以说完成了90%，为什么呢，因为脚本cpu_temp.py不是一定能够运行成功的，每个人的服务器的cpu温度缓存文件路径不一定都是一样的，首先我们来检查一下脚本能否正常启动读取数据："></a>至此，自定义扩展算完成了100%，也可以说完成了90%，为什么呢，因为脚本cpu_temp.py不是一定能够运行成功的，每个人的服务器的cpu温度缓存文件路径不一定都是一样的，首先我们来检查一下脚本能否正常启动读取数据：</h6><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python2 cpu_temp.py</span><br></pre></td></tr></table></figure>
+<p>如果你看到报错，并且是说找不到文件路径，或者文件路径不存在的错误的话，建议你去搜索一下cpu温度的相关缓存文件在哪，然后再和脚本的路径对比，你就可以修改脚本文件，最终得以正确运行脚本</p>
+<p>下面我已经注释了修改的路径，如果你们的修改之后，这个路径还是不对的话，你们你们可以直接搜索下面这条命令，然后将搜索出来的文件路径和脚本的路径进行对比，就很快改好这个脚本了:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo find / -name coretemp*</span><br></pre></td></tr></table></figure></p>
+<p>下面我放一下我修改后的代码：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!/usr/bin/env python2</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"># @Time    : 2019/8/15 19:43</span><br><span class="line"># @Author  : qizai</span><br><span class="line"># @File    : cpu_temp.py</span><br><span class="line"># @Software: PyCharm</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">descriptors = list()</span><br><span class="line">sysdir = &apos;/sys/devices/platform/&apos;</span><br><span class="line">handler_dict = dict()</span><br><span class="line"></span><br><span class="line">def metric_init(params):</span><br><span class="line">    global descriptors</span><br><span class="line">    try:</span><br><span class="line">        coretemp_list = [i for i in os.listdir(sysdir) if i.startswith(&apos;coretemp&apos;)]</span><br><span class="line">    except OSError:</span><br><span class="line">        print &apos;No dir named&apos; + sysdir</span><br><span class="line">        os._exit(1)</span><br><span class="line">    if not coretemp_list:</span><br><span class="line">        print &apos;No dir name starts with coretemp&apos;</span><br><span class="line">        os._exit(1)</span><br><span class="line">    for coretemp in coretemp_list:  # 记得全部都要对应加上这个路径 /hwmon/hwmon1，不然全部都是找不到的,你们根据自己服务器来对应修改</span><br><span class="line">        coreinput_list = [i for i in os.listdir(sysdir + coretemp + &apos;/hwmon/hwmon1&apos;) if i.endswith(&apos;_input&apos;)]</span><br><span class="line">        try:</span><br><span class="line">            with open(sysdir + coretemp + &apos;/hwmon/hwmon1&apos; + &apos;/temp1_label&apos;,&apos;r&apos;) as f:</span><br><span class="line">                phy_id_prefix = f.read().split()[-1]</span><br><span class="line">        except IOError:</span><br><span class="line">            print &apos;No temp1_label file&apos;</span><br><span class="line">            os._exit(1)</span><br><span class="line">        for coreinput in coreinput_list:</span><br><span class="line">            build_descriptor(coretemp,coreinput,phy_id_prefix)</span><br><span class="line">    return descriptors</span><br><span class="line"></span><br><span class="line">def build_descriptor(coretemp,coreinput,phy_id_prefix):</span><br><span class="line">    global handler_dict</span><br><span class="line">    if coreinput == &apos;temp1_input&apos;:</span><br><span class="line">        name = &apos;cpu_temp_physical_&apos; + phy_id_prefix</span><br><span class="line">        description = &apos;Physical CPU id &apos; + phy_id_prefix + &apos; Temperature&apos;</span><br><span class="line">        groups = &apos;cpu_temp_physical&apos;</span><br><span class="line">        handler_dict[name] = sysdir + coretemp + &apos;/hwmon/hwmon1&apos; + &apos;/temp1_input&apos;</span><br><span class="line">    else:</span><br><span class="line">        with open(sysdir + coretemp + &apos;/hwmon/hwmon1&apos; + &apos;/&apos; + coreinput[:-6] + &apos;_label&apos;,&apos;r&apos;) as f:</span><br><span class="line">            coreid = f.read().split()[-1]</span><br><span class="line">        name = &apos;cpu_temp_core_&apos; + phy_id_prefix + &apos;_&apos; + coreid</span><br><span class="line">        description = &apos;Physical CPU id &apos; + phy_id_prefix + &apos; Core &apos; + coreid + &apos; Temperature&apos;</span><br><span class="line">        groups = &apos;cpu_temp_core&apos;</span><br><span class="line">        handler_dict[name] = sysdir + coretemp + &apos;/hwmon/hwmon1&apos; + &apos;/&apos; + coreinput</span><br><span class="line">    call_back = metric_handler</span><br><span class="line">    d = &#123;&apos;name&apos;: name,</span><br><span class="line">        &apos;call_back&apos;: call_back,</span><br><span class="line">        &apos;time_max&apos;: 60,</span><br><span class="line">        &apos;value_type&apos;: &apos;float&apos;,</span><br><span class="line">        &apos;units&apos;: &apos;C&apos;,</span><br><span class="line">        &apos;slope&apos;: &apos;both&apos;,</span><br><span class="line">        &apos;format&apos;: &apos;%.1f&apos;,</span><br><span class="line">        &apos;description&apos;: description,</span><br><span class="line">        &apos;groups&apos;: groups</span><br><span class="line">        &#125;</span><br><span class="line">    try:</span><br><span class="line">        call_back(name)</span><br><span class="line">        descriptors.append(d)</span><br><span class="line">    except:</span><br><span class="line">        print &apos;Build descriptor Failed&apos;</span><br><span class="line"></span><br><span class="line">def metric_handler(name):</span><br><span class="line">    try:</span><br><span class="line">        with open(handler_dict.get(name),&apos;r&apos;) as f:</span><br><span class="line">            temp = f.read()</span><br><span class="line">    except:</span><br><span class="line">        temp = 0</span><br><span class="line">    temp_float = int(temp) / 1000.0</span><br><span class="line">    return temp_float</span><br><span class="line"></span><br><span class="line">def metric_cleanup():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">     metric_init(&#123;&#125;)</span><br><span class="line">     for d in descriptors:</span><br><span class="line">         v = d[&apos;call_back&apos;](d[&apos;name&apos;])</span><br><span class="line">         print &quot;----------------------------------------------------------------------------------------&quot;</span><br><span class="line">         print &apos;value for %s is %.1f %s&apos; % (d[&apos;name&apos;],v,d[&apos;units&apos;])</span><br><span class="line">         for k,v in d.iteritems():</span><br><span class="line">             print k,v</span><br></pre></td></tr></table></figure></p>
+<h6 id="0x06、重启服务端、客户端"><a href="#0x06、重启服务端、客户端" class="headerlink" title="0x06、重启服务端、客户端"></a>0x06、重启服务端、客户端</h6><p>在这里我又要提醒各位，重启的时候，貌似也有一定的顺序，个人测试了发现，重启顺序如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo /etc/init.d/gmetad restart  # 最先要重启服务端(或者理解为，先启动服务器)</span><br><span class="line">sudo /etc/init.d/ganglia-monitor restart   # 然后再启动客户端</span><br><span class="line">sudo /etc/init.d/apache2 restart  # 再启动Apache</span><br></pre></td></tr></table></figure>
+<p>上面重启的步骤当中，最主要就是：启动服务端要比启动客户端早才行，不然你在ganglia-web看不到客户端这些节点的，或者看到节点也是看不到数据的，我在这里已经踩坑很久了，找了很久原因才找到是这个原因，希望能够帮助你们。</p>
+<h6 id="0x07、最后来看一下自定义插件能否生效"><a href="#0x07、最后来看一下自定义插件能否生效" class="headerlink" title="0x07、最后来看一下自定义插件能否生效"></a>0x07、最后来看一下自定义插件能否生效</h6><p><img src="https://img-blog.csdnimg.cn/20190824232956240.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>如果你细心的话，在前面截图当中，你已经见到过这个监控服务了，本人在写这篇博客的时候，是已经配置好了的，所以你在前面见到这个监控服务当然是正常的。</p>
+<p>但如果是新的节点，只是默认配置的话，是没有这个监控cpu温度的，因为前面也说了每个服务器的cpu温度缓存文件是不一定都是同一个，所以ganglia开发者是很难适配我们所有的用户的。<br><img src="https://img-blog.csdnimg.cn/2019082423343876.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="至此本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗"></a>至此本文教程写完了，希望能够帮助到各位在运维路上的小伙伴们，觉得不错点个赞呗</h5><h5 id="感谢认真读完的这篇教程的您"><a href="#感谢认真读完的这篇教程的您" class="headerlink" title="感谢认真读完的这篇教程的您"></a>感谢认真读完的这篇教程的您</h5><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/99658593" target="_blank" rel="noopener">最详细nagios配置说明及注意事项</a>；</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>运维</tag>
+        <tag>ganglia</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>最详细nagios配置说明及注意事项</title>
-    <url>/2019/06/16/nagios/</url>
+    <url>/2019/06/15/nagios/</url>
     <content><![CDATA[<h5 id="0x00、前言"><a href="#0x00、前言" class="headerlink" title="0x00、前言"></a>0x00、前言</h5><h5 id="至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）"><a href="#至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）" class="headerlink" title="至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）"></a>至于安装这里不再讲述，直接讲述配置出现的小坑、大坑及神坑！！（好了，我也不知道下面提到的算不算神坑）</h5><h5 id="0x01、依赖环境"><a href="#0x01、依赖环境" class="headerlink" title="0x01、依赖环境"></a>0x01、依赖环境</h5><p>先讲述一下这里需要的依赖是：nagios、ganglia、apache、Python2.7（及可能使用到Python2.7，为啥呢？因为你使用py脚本来扩展监控的话，那么，这里也需要安装一下，好像centos或者ubantu都是自带Python2.7的）</p><a id="more"></a>
 <h5 id="0x02、安装文件路径"><a href="#0x02、安装文件路径" class="headerlink" title="0x02、安装文件路径"></a>0x02、安装文件路径</h5><h6 id="tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！"><a href="#tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！" class="headerlink" title="tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！"></a>tips：先来看一下nagios安装之后的路径，这个路径是我目前安装出现的路径，至于其他路径，欢迎各位小伙伴在下面评论里面补充一下，感谢！</h6><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/usr/local/nagios  # nagios安装路径，修改过默认安装路径的同学，自行替换哈</span><br></pre></td></tr></table></figure>
 <p>nagios目录包含如下文件：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@localhost:/usr/local$ tree nagios/ -L 1</span><br><span class="line">nagios</span><br><span class="line">├── bin      # Nagios 可执行程序所在目录</span><br><span class="line">├── etc      # 这个是有nagios重要配置的文件，如nagios.cfg文件</span><br><span class="line">├── libexec  # 这个是脚本的存放路径,即Nagios 外部插件所在目录</span><br><span class="line">├── sbin     # Nagios CGI 文件所在目录，也就是执行外部命令所需文件所在的目录</span><br><span class="line">├── share    # Nagios网页文件所在的目录</span><br><span class="line">└── var      # Nagios 日志文件、lock 等文件所在的目录</span><br></pre></td></tr></table></figure></p>
@@ -275,6 +382,7 @@
       <tags>
         <tag>运维</tag>
         <tag>监控</tag>
+        <tag>nagios</tag>
       </tags>
   </entry>
   <entry>
