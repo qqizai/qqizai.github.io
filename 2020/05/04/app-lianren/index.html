@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-qizai-32-32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="qizai" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="重点：==先向声明一下：本文仅仅是用于技术交流，而非传播sexy相关的东西，谢谢。==这是一篇入门级的APP逆向教程，如有写着不对的地方，烦请大佬们指出，互相学习，谢谢啦">
+<meta name="keywords" content="安卓逆向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【APP逆向-入门级】 某直播APP逆向过程">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;05&#x2F;04&#x2F;app-lianren&#x2F;index.html">
+<meta property="og:site_name" content="qizai">
+<meta property="og:description" content="重点：==先向声明一下：本文仅仅是用于技术交流，而非传播sexy相关的东西，谢谢。==这是一篇入门级的APP逆向教程，如有写着不对的地方，烦请大佬们指出，互相学习，谢谢啦">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501221237276.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501221214445.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501223012714.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501223421483.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501223044692.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501223109391.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501223119958.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2020050122312760.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501230410779.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501231116935.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502211014480.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502202144885.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502211149489.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502223039562.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502212148693.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2020050221461558.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502220250206.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2020050222080531.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502220949175.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200502221547811.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2020050222182185.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+<meta property="og:updated_time" content="2020-05-04T08:46:50.423Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20200501221237276.jpg?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/04/app-lianren/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【APP逆向-入门级】 某直播APP逆向过程 | qizai</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">qizai</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">一个在IT行业摸爬打滚的程序猿</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/qqizai" class="github-corner" title="Qizai GitHub" aria-label="Qizai GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/04/app-lianren/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/qizai.png">
+      <meta itemprop="name" content="qizai">
+      <meta itemprop="description" content="目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qizai">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【APP逆向-入门级】 某直播APP逆向过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-04 16:42:56 / 修改时间：16:46:50" itemprop="dateCreated datePublished" datetime="2020-05-04T16:42:56+08:00">2020-05-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" itemprop="url" rel="index">
+                    <span itemprop="name">安卓逆向</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>重点：==先向声明一下：本文仅仅是用于技术交流，而非传播sexy相关的东西，谢谢。==</strong></p><p>这是一篇<strong>入门级的APP逆向教程</strong>，如有写着不对的地方，烦请大佬们指出，互相学习，谢谢啦</p><a id="more"></a>
+
+<p>感兴趣的应该知道的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5oGL5Lq6</span><br></pre></td></tr></table></figure></p>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>本文起源于：前两天，我的一位朋友跟我说，他在QQ群里面，一位群友，发了一些黑色/灰色地带的产业链信息，他就仅仅是好奇，去下载了那款APP</p>
+<p>原来发现，QQ群友的分享，是为那款APP做引流，一个有效的分享可以获得多少金币(砖石)这种(是指引导别人来注册，才算有效分享，才能获取金币)</p>
+<p>打开之后，发现很惊人，这搞的==带颜色==的直播啊！！！</p>
+<p>而这直播APP里面区分：免费和付费的房间，当你想要看付费的房间，那你只能看前面几十秒钟的时间，过了这个时间就会弹窗出来，让你付费，才能继续看</p>
+<p>==我朋友就让我帮忙看看，跟我说有什么能难倒程序员的？？而且刚好最近我在学APP逆向，心里想着，这种灰产的APP又不能大力宣传，估计反逆向不会做很好吧？然后就开始尝试搞搞，看看能不能逆了它==</p>
+<h5 id="0x00、预估一下本次的逆向步骤"><a href="#0x00、预估一下本次的逆向步骤" class="headerlink" title="0x00、预估一下本次的逆向步骤"></a>0x00、预估一下本次的逆向步骤</h5><ul>
+<li>[x] 第一步、抓包分析</li>
+<li>[x] 第二步、反编译</li>
+<li>[x] 第三步、根据第一步的抓包关键词来搜索</li>
+<li>[x] 第三步、根据抓包信息、收费弹窗，来分析这个收费的逻辑</li>
+<li>[x] 第四步、得出这个逻辑之后，对smali代码进行篡改，保存</li>
+<li>[x] 第五步、回编译APP，重新打包签名</li>
+</ul>
+<blockquote>
+<p>本次用到的工具：魅族手机(Flyme6)已经root的、HttpCanary抓包工具、MT管理器、xxApp(这个不公开说了)</p>
+</blockquote>
+<h5 id="0x01、首要就是抓包分析"><a href="#0x01、首要就是抓包分析" class="headerlink" title="0x01、首要就是抓包分析"></a>0x01、首要就是抓包分析</h5><p>由于本次使用的手机是root的，而且抓包工具的证书已经被我安装到系统证书的目录下，而非直接安装到用户个人证书(所以对于本次APP是否有检验抓包工具检测这一块，直接忽略掉)</p>
+<p>打开HttpCanary抓包工具，然后找到【设置】<br><img src="https://img-blog.csdnimg.cn/20200501221237276.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后选择【目标应用】，这里为了过滤无用的包，减少干扰，利于快速分析<br><img src="https://img-blog.csdnimg.cn/20200501221214445.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223012714.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>返回去之后，点击开始【抓包】，然后转向去打开目标APP，然后打开一些room，免费的、收费的都开一下，目的就是为了抓包，看看APP发起了哪些请求、收到哪些响应<br><img src="https://img-blog.csdnimg.cn/20200501223421483.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>再切换回来之后，发现已经存在一堆抓包信息了</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223044692.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>一个一个查看包响应，看看有什么收获</p>
+<p>没想到，竟然发现如此大的突破口</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223109391.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>看下面的两张截图前，再次向广大博友们声明：本次教程仅仅是用于技术交流，而非传播sexy相关的，谢谢。</p>
+<p>下面来看两张收费的room的就截图：一个用户点进去看了几十秒(应该是30s，具体是多少没有数)，然后就弹窗出来说得需要付费才能继续，这不诱惑人进行付费吗？</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223119958.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/2020050122312760.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>惹，真的是低俗呀，这都什么人啊？出卖自己body来挣钱？</p>
+<h5 id="0x02、反编译APP"><a href="#0x02、反编译APP" class="headerlink" title="0x02、反编译APP"></a>0x02、反编译APP</h5><ol>
+<li>鄙人一开始是，使用 jadx-gui 来反编译APP，发现没有壳、没有很强的混淆，可以直接反编译</li>
+</ol>
+<ol>
+<li>反编译之后，进行相关的关键字来搜索，前面抓包中，有个很有用的关键词：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;type&quot;: &quot;2&quot;,</span><br><span class="line">&quot;type_val&quot;: &quot;38&quot;,</span><br><span class="line">&quot;type_msg&quot;: &quot;本房间为收费房间，需支付38钻石&quot;</span><br></pre></td></tr></table></figure>
+<p>再来简单分析一下：这三个字段中，如果你直接搜索 type 的话，根据经验，这肯定会出现很多搜索结果，排除它；而 type_val 、type_msg 这两个字段出现的概率不会很大，那么分析完了，就开始搜索呗！！！</p>
+<p>首次我搜索的是 type_val ，但是出来的结果还是不够精准，有6/7条结果；<br>然后==转而去搜索 type_msg==，发现出来的结果只有两处，这不就是很精准了吗，噢耶！！</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501230410779.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后选择第二个进去看看。</p>
+<p>你们可以思考一下为什么是选第二个呢？(我个人纯粹是靠大胆的猜测，因为第二个有关键词 LiveRoom，就是直播房间嘛)</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501231116935.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>发现抓包中的三个参数，都在这里取出来了，而且发现是对那个 type 字段进行判断是否收费的，多次抓包分析得出返回的数据中：免费房间的 type=0，收费的房间 type=2，至于代码中还有一个 type=1 的判断，看到代码中调用的方法名，可以猜测：</p>
+<ul>
+<li>type=0，调用 forwardNormalRoom 方法，根据字面意思是：转到正常(免费)房间处理逻辑</li>
+<li>type=1，调用 forwardPwdRoom 方法，根据字面意思是：转到输入房间密码处理逻辑</li>
+<li>type=2 || type=3，调用 forwardPayRoom 方法，根据字面意思是：转到房间收费的处理逻辑</li>
+</ul>
+<p>==所以，我们只需要将，type=1/2/3里面的调用方法，改为调用type=0的方法即可绕过这个限制，话不多说，下面就是修改的步骤，Just do IT==</p>
+<h5 id="0x03、修改-smali-代码，重新打包、签名"><a href="#0x03、修改-smali-代码，重新打包、签名" class="headerlink" title="0x03、修改 smali 代码，重新打包、签名"></a>0x03、修改 smali 代码，重新打包、签名</h5><p>理清当前逻辑之后，本文使用最轻量级的、入门级的、小白级的工具——==MT管理器==</p>
+<p>简单来简述一下它的功能：</p>
+<ul>
+<li>[x] 其他文件夹有的基础功能它也都有(复制、移动、重命名等等)</li>
+<li>[x] ==APP安装包编辑==，主要有 DEX 编辑，ARSC 编辑，XML 编辑，APK 签名、APK 优化、APK 共存、去除签名校验、RES 资源混淆、RES 反资源混淆、翻译模式等</li>
+<li>[x] 可以修改文件夹权限(系统目录的话，需要 root 权限才能修改)</li>
+<li>[x] 自带强大的文本编辑器，可以流畅编辑大文本文件，支持设置是否显示行号、开关自动换行、双指缩放字体大小、自动识别编码、代码语法高亮、自动缩进、正则搜索替换</li>
+</ul>
+<p>其他更加强大功能，待你们去发掘，相信用过了之后，你们会觉得这是用来修改APP包/破解APP限制的一个好工具。</p>
+<p>本次主要是使用它的第二个功能——==APP安装包编辑功能==</p>
+<ol>
+<li>使用MT管理器【查看】目标APP包<br><img src="https://img-blog.csdnimg.cn/20200502211014480.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200502202144885.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<p>==图中我圈了红色的三个文件是我们待会需要进行操作的==</p>
+<p>其中，第一个 ==META-INF== 目录中，包含了一些签名文件等，我们将里面的==三个文件删除掉：CERT.RSA、CERT.SF、MANIFEST.MF==（其中CERT.RSA、CERT.SF这两个命名，不同APP可能会名字不一样，只要找到后缀格式一样的即可）。</p>
+<p>==Tips==：鄙人在这里踩了一个坑，这个好像得需要删掉这三个文件打包才不会被检测到。不然重新打包签名之后，一联网打开APP就会出现==闪退==的情况，估计是被检测检验了。</p>
+<p>文件 ==classes.dex、classes2.dex== 就是APP编译之后，Class转成成.dex文件，dex是Android平台上(Dalvik虚拟机)的可执行文件, 相当于Windows平台中的exe文件, 每个Apk安装包中都有dex文件, 里面包含了该app的所有源码, 通过反编译工具可以获取到相应的java源码。</p>
+<p>一些工程很大的话就会产生多个.dex文件，到现在有了前面的介绍，我们可以简单的知道：dex 文件就变相等于可执行的源码，那我们可以通过修改这个源码来达到逆向的目的(说法如有说错，烦请大佬们纠正，谢谢啦)。</p>
+<ol>
+<li>先打开第一个dex文件，MT管理器会提示我们，要用哪个打开，选择 【Dex编辑器++】即可<br><img src="https://img-blog.csdnimg.cn/20200502211149489.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+</ol>
+<p>3.选择【搜索】 ，然后输入刚刚那些关键词【type_msg】<br><img src="https://img-blog.csdnimg.cn/20200502223039562.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ol>
+<li>点击右上角，再次进行搜索：【type_msg】<br><img src="https://img-blog.csdnimg.cn/20200502212148693.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>此处，你得需要一些smali语法，但是本文我只介绍本文使用的语法：</li>
+</ol>
+<ul>
+<li>[x] if-eqz : 意思就是 是否等于0（if equal zero）</li>
+<li>[x] if-eq：意思就是 是否相等 （if equal）</li>
+<li>[x] const/4 p2，0x1：意思就是将0x1，即0x01赋值到 p2 ，即 p2=1</li>
+</ul>
+<p>所以，<code>if-eqz p1，：cond_4b</code>就是：如果 p1=0，那么调用方法 cond_4b;<br><code>if-eq p1,p2，：cond_45</code>如果 p1=p2(p1=1)，那么调用方法 cond_45 ；</p>
+<p>这也印证了我们前面反编译APP的源码逻辑。<br>那肯定会有小伙伴会问，那个 cond_4b 是什么方法？很好，我这里回答一下，因为通过我们前面反编译的分析，我们已经知道，如果type=0的时候就是调用 forwardNormalRoom 方法，所以，可以肯定的告诉你们，这个cond_4b就是指向这个 forwardNormalRoom 方法。</p>
+<ol>
+<li>将type=1/2/3的情况，调用的方法改为调用 cond_4b 即可，然后点击右上角的保存<br><img src="https://img-blog.csdnimg.cn/2020050221461558.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+<li><p>保存之后，返回上一层第一层搜索的时候，点击右上角，选择【编译】<br><img src="https://img-blog.csdnimg.cn/20200502220250206.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+<li><p>编译之后进行返回，返回的时候会提示你，点击【退出】即可。此时会再次提示你，dex文件已经修改，问你是否更新到压缩包中 ，我们选择【确定】<br><img src="https://img-blog.csdnimg.cn/2020050222080531.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后你会看到压缩在更新<br><img src="https://img-blog.csdnimg.cn/20200502220949175.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+<li><p>然后返回之后，你会看到一个刚刚被修改过的apk文件，显示绿色名字的，然后点击它，第一步选择【功能】、第二步选择【APK签名】<br><img src="https://img-blog.csdnimg.cn/20200502221547811.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>选择【确定】即可<br><img src="https://img-blog.csdnimg.cn/2020050222182185.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后你就可以【猥琐欲为】啦</p>
+</li>
+</ol>
+<h5 id="0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…"><a href="#0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…" class="headerlink" title="0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…"></a>0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…</h5><p><strong>本文==入门级的APP逆向教程==已经编写完毕，妈呀，花了几个小时来重新演示逆向过程，以及编写本篇文章</strong></p>
+<h5 id="最后-真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀"><a href="#最后-真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀" class="headerlink" title="最后: 真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀"></a>最后: 真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀</h5><p>题外话：希望小伙伴们都别用于非法的手段，本文只是技术交流</p>
+<p><strong>谢谢大家</strong></p>
+<p>相关文献参考：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/qq_38449518/article/details/82414069?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1" target="_blank" rel="noopener">META-INF目录是干啥用的？</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AE%89%E5%8D%93%E9%80%86%E5%90%91/" rel="tag"># 安卓逆向</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020/05/04/get-and-set-attr/" rel="next" title="【Python】getattr和setattr的源码分析及使用">
+                  <i class="fa fa-chevron-left"></i> 【Python】getattr和setattr的源码分析及使用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#0x00、预估一下本次的逆向步骤"><span class="nav-number">1.1.</span> <span class="nav-text">0x00、预估一下本次的逆向步骤</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x01、首要就是抓包分析"><span class="nav-number">1.2.</span> <span class="nav-text">0x01、首要就是抓包分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x02、反编译APP"><span class="nav-number">1.3.</span> <span class="nav-text">0x02、反编译APP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x03、修改-smali-代码，重新打包、签名"><span class="nav-number">1.4.</span> <span class="nav-text">0x03、修改 smali 代码，重新打包、签名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…"><span class="nav-number">1.5.</span> <span class="nav-text">0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#最后-真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀"><span class="nav-number">1.6.</span> <span class="nav-text">最后: 真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="qizai"
+      src="/images/qizai.png">
+  <p class="site-author-name" itemprop="name">qizai</p>
+  <div class="site-description" itemprop="description">目前主要涉猎的编程是:Python，爬虫、运维，其他领域还在努力学习ing</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qizai</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.5.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      element.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '44618db3409b8e2ef4db',
+      clientSecret: '61a79fe046604cf8e5be252a5b8a2b9384c0609f',
+      repo: 'qqizai.github.io',
+      owner: 'qqizai',
+      admin: ['qqizai'],
+      id: '5d7bc12dbe71b510a955d178186469ee',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+    </div>
+</body>
+</html>

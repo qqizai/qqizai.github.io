@@ -1,6 +1,448 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>【APP逆向-入门级】 某直播APP逆向过程</title>
+    <url>/2020/05/04/app-lianren/</url>
+    <content><![CDATA[<p><strong>重点：==先向声明一下：本文仅仅是用于技术交流，而非传播sexy相关的东西，谢谢。==</strong></p><p>这是一篇<strong>入门级的APP逆向教程</strong>，如有写着不对的地方，烦请大佬们指出，互相学习，谢谢啦</p><a id="more"></a>
+
+<p>感兴趣的应该知道的：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">5oGL5Lq6</span><br></pre></td></tr></table></figure></p>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>本文起源于：前两天，我的一位朋友跟我说，他在QQ群里面，一位群友，发了一些黑色/灰色地带的产业链信息，他就仅仅是好奇，去下载了那款APP</p>
+<p>原来发现，QQ群友的分享，是为那款APP做引流，一个有效的分享可以获得多少金币(砖石)这种(是指引导别人来注册，才算有效分享，才能获取金币)</p>
+<p>打开之后，发现很惊人，这搞的==带颜色==的直播啊！！！</p>
+<p>而这直播APP里面区分：免费和付费的房间，当你想要看付费的房间，那你只能看前面几十秒钟的时间，过了这个时间就会弹窗出来，让你付费，才能继续看</p>
+<p>==我朋友就让我帮忙看看，跟我说有什么能难倒程序员的？？而且刚好最近我在学APP逆向，心里想着，这种灰产的APP又不能大力宣传，估计反逆向不会做很好吧？然后就开始尝试搞搞，看看能不能逆了它==</p>
+<h5 id="0x00、预估一下本次的逆向步骤"><a href="#0x00、预估一下本次的逆向步骤" class="headerlink" title="0x00、预估一下本次的逆向步骤"></a>0x00、预估一下本次的逆向步骤</h5><ul>
+<li>[x] 第一步、抓包分析</li>
+<li>[x] 第二步、反编译</li>
+<li>[x] 第三步、根据第一步的抓包关键词来搜索</li>
+<li>[x] 第三步、根据抓包信息、收费弹窗，来分析这个收费的逻辑</li>
+<li>[x] 第四步、得出这个逻辑之后，对smali代码进行篡改，保存</li>
+<li>[x] 第五步、回编译APP，重新打包签名</li>
+</ul>
+<blockquote>
+<p>本次用到的工具：魅族手机(Flyme6)已经root的、HttpCanary抓包工具、MT管理器、xxApp(这个不公开说了)</p>
+</blockquote>
+<h5 id="0x01、首要就是抓包分析"><a href="#0x01、首要就是抓包分析" class="headerlink" title="0x01、首要就是抓包分析"></a>0x01、首要就是抓包分析</h5><p>由于本次使用的手机是root的，而且抓包工具的证书已经被我安装到系统证书的目录下，而非直接安装到用户个人证书(所以对于本次APP是否有检验抓包工具检测这一块，直接忽略掉)</p>
+<p>打开HttpCanary抓包工具，然后找到【设置】<br><img src="https://img-blog.csdnimg.cn/20200501221237276.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后选择【目标应用】，这里为了过滤无用的包，减少干扰，利于快速分析<br><img src="https://img-blog.csdnimg.cn/20200501221214445.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223012714.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>返回去之后，点击开始【抓包】，然后转向去打开目标APP，然后打开一些room，免费的、收费的都开一下，目的就是为了抓包，看看APP发起了哪些请求、收到哪些响应<br><img src="https://img-blog.csdnimg.cn/20200501223421483.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>再切换回来之后，发现已经存在一堆抓包信息了</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223044692.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>一个一个查看包响应，看看有什么收获</p>
+<p>没想到，竟然发现如此大的突破口</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223109391.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>看下面的两张截图前，再次向广大博友们声明：本次教程仅仅是用于技术交流，而非传播sexy相关的，谢谢。</p>
+<p>下面来看两张收费的room的就截图：一个用户点进去看了几十秒(应该是30s，具体是多少没有数)，然后就弹窗出来说得需要付费才能继续，这不诱惑人进行付费吗？</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501223119958.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/2020050122312760.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>惹，真的是低俗呀，这都什么人啊？出卖自己body来挣钱？</p>
+<h5 id="0x02、反编译APP"><a href="#0x02、反编译APP" class="headerlink" title="0x02、反编译APP"></a>0x02、反编译APP</h5><ol>
+<li>鄙人一开始是，使用 jadx-gui 来反编译APP，发现没有壳、没有很强的混淆，可以直接反编译</li>
+</ol>
+<ol>
+<li>反编译之后，进行相关的关键字来搜索，前面抓包中，有个很有用的关键词：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&quot;type&quot;: &quot;2&quot;,</span><br><span class="line">&quot;type_val&quot;: &quot;38&quot;,</span><br><span class="line">&quot;type_msg&quot;: &quot;本房间为收费房间，需支付38钻石&quot;</span><br></pre></td></tr></table></figure>
+<p>再来简单分析一下：这三个字段中，如果你直接搜索 type 的话，根据经验，这肯定会出现很多搜索结果，排除它；而 type_val 、type_msg 这两个字段出现的概率不会很大，那么分析完了，就开始搜索呗！！！</p>
+<p>首次我搜索的是 type_val ，但是出来的结果还是不够精准，有6/7条结果；<br>然后==转而去搜索 type_msg==，发现出来的结果只有两处，这不就是很精准了吗，噢耶！！</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501230410779.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后选择第二个进去看看。</p>
+<p>你们可以思考一下为什么是选第二个呢？(我个人纯粹是靠大胆的猜测，因为第二个有关键词 LiveRoom，就是直播房间嘛)</p>
+<p><img src="https://img-blog.csdnimg.cn/20200501231116935.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<p>发现抓包中的三个参数，都在这里取出来了，而且发现是对那个 type 字段进行判断是否收费的，多次抓包分析得出返回的数据中：免费房间的 type=0，收费的房间 type=2，至于代码中还有一个 type=1 的判断，看到代码中调用的方法名，可以猜测：</p>
+<ul>
+<li>type=0，调用 forwardNormalRoom 方法，根据字面意思是：转到正常(免费)房间处理逻辑</li>
+<li>type=1，调用 forwardPwdRoom 方法，根据字面意思是：转到输入房间密码处理逻辑</li>
+<li>type=2 || type=3，调用 forwardPayRoom 方法，根据字面意思是：转到房间收费的处理逻辑</li>
+</ul>
+<p>==所以，我们只需要将，type=1/2/3里面的调用方法，改为调用type=0的方法即可绕过这个限制，话不多说，下面就是修改的步骤，Just do IT==</p>
+<h5 id="0x03、修改-smali-代码，重新打包、签名"><a href="#0x03、修改-smali-代码，重新打包、签名" class="headerlink" title="0x03、修改 smali 代码，重新打包、签名"></a>0x03、修改 smali 代码，重新打包、签名</h5><p>理清当前逻辑之后，本文使用最轻量级的、入门级的、小白级的工具——==MT管理器==</p>
+<p>简单来简述一下它的功能：</p>
+<ul>
+<li>[x] 其他文件夹有的基础功能它也都有(复制、移动、重命名等等)</li>
+<li>[x] ==APP安装包编辑==，主要有 DEX 编辑，ARSC 编辑，XML 编辑，APK 签名、APK 优化、APK 共存、去除签名校验、RES 资源混淆、RES 反资源混淆、翻译模式等</li>
+<li>[x] 可以修改文件夹权限(系统目录的话，需要 root 权限才能修改)</li>
+<li>[x] 自带强大的文本编辑器，可以流畅编辑大文本文件，支持设置是否显示行号、开关自动换行、双指缩放字体大小、自动识别编码、代码语法高亮、自动缩进、正则搜索替换</li>
+</ul>
+<p>其他更加强大功能，待你们去发掘，相信用过了之后，你们会觉得这是用来修改APP包/破解APP限制的一个好工具。</p>
+<p>本次主要是使用它的第二个功能——==APP安装包编辑功能==</p>
+<ol>
+<li>使用MT管理器【查看】目标APP包<br><img src="https://img-blog.csdnimg.cn/20200502211014480.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200502202144885.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<p>==图中我圈了红色的三个文件是我们待会需要进行操作的==</p>
+<p>其中，第一个 ==META-INF== 目录中，包含了一些签名文件等，我们将里面的==三个文件删除掉：CERT.RSA、CERT.SF、MANIFEST.MF==（其中CERT.RSA、CERT.SF这两个命名，不同APP可能会名字不一样，只要找到后缀格式一样的即可）。</p>
+<p>==Tips==：鄙人在这里踩了一个坑，这个好像得需要删掉这三个文件打包才不会被检测到。不然重新打包签名之后，一联网打开APP就会出现==闪退==的情况，估计是被检测检验了。</p>
+<p>文件 ==classes.dex、classes2.dex== 就是APP编译之后，Class转成成.dex文件，dex是Android平台上(Dalvik虚拟机)的可执行文件, 相当于Windows平台中的exe文件, 每个Apk安装包中都有dex文件, 里面包含了该app的所有源码, 通过反编译工具可以获取到相应的java源码。</p>
+<p>一些工程很大的话就会产生多个.dex文件，到现在有了前面的介绍，我们可以简单的知道：dex 文件就变相等于可执行的源码，那我们可以通过修改这个源码来达到逆向的目的(说法如有说错，烦请大佬们纠正，谢谢啦)。</p>
+<ol>
+<li>先打开第一个dex文件，MT管理器会提示我们，要用哪个打开，选择 【Dex编辑器++】即可<br><img src="https://img-blog.csdnimg.cn/20200502211149489.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+</ol>
+<p>3.选择【搜索】 ，然后输入刚刚那些关键词【type_msg】<br><img src="https://img-blog.csdnimg.cn/20200502223039562.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+<ol>
+<li>点击右上角，再次进行搜索：【type_msg】<br><img src="https://img-blog.csdnimg.cn/20200502212148693.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>此处，你得需要一些smali语法，但是本文我只介绍本文使用的语法：</li>
+</ol>
+<ul>
+<li>[x] if-eqz : 意思就是 是否等于0（if equal zero）</li>
+<li>[x] if-eq：意思就是 是否相等 （if equal）</li>
+<li>[x] const/4 p2，0x1：意思就是将0x1，即0x01赋值到 p2 ，即 p2=1</li>
+</ul>
+<p>所以，<code>if-eqz p1，：cond_4b</code>就是：如果 p1=0，那么调用方法 cond_4b;<br><code>if-eq p1,p2，：cond_45</code>如果 p1=p2(p1=1)，那么调用方法 cond_45 ；</p>
+<p>这也印证了我们前面反编译APP的源码逻辑。<br>那肯定会有小伙伴会问，那个 cond_4b 是什么方法？很好，我这里回答一下，因为通过我们前面反编译的分析，我们已经知道，如果type=0的时候就是调用 forwardNormalRoom 方法，所以，可以肯定的告诉你们，这个cond_4b就是指向这个 forwardNormalRoom 方法。</p>
+<ol>
+<li>将type=1/2/3的情况，调用的方法改为调用 cond_4b 即可，然后点击右上角的保存<br><img src="https://img-blog.csdnimg.cn/2020050221461558.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></li>
+<li><p>保存之后，返回上一层第一层搜索的时候，点击右上角，选择【编译】<br><img src="https://img-blog.csdnimg.cn/20200502220250206.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+<li><p>编译之后进行返回，返回的时候会提示你，点击【退出】即可。此时会再次提示你，dex文件已经修改，问你是否更新到压缩包中 ，我们选择【确定】<br><img src="https://img-blog.csdnimg.cn/2020050222080531.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后你会看到压缩在更新<br><img src="https://img-blog.csdnimg.cn/20200502220949175.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"></p>
+</li>
+<li><p>然后返回之后，你会看到一个刚刚被修改过的apk文件，显示绿色名字的，然后点击它，第一步选择【功能】、第二步选择【APK签名】<br><img src="https://img-blog.csdnimg.cn/20200502221547811.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>选择【确定】即可<br><img src="https://img-blog.csdnimg.cn/2020050222182185.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>然后你就可以【猥琐欲为】啦</p>
+</li>
+</ol>
+<h5 id="0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…"><a href="#0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…" class="headerlink" title="0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…"></a>0x04、最后重新签名之后，你可以卸载原来的APP，然后装上这个无限制的版本，哈哈哈…</h5><p><strong>本文==入门级的APP逆向教程==已经编写完毕，妈呀，花了几个小时来重新演示逆向过程，以及编写本篇文章</strong></p>
+<h5 id="最后-真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀"><a href="#最后-真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀" class="headerlink" title="最后: 真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀"></a>最后: 真感谢每一位小伙伴，竟然看完了我的文章，谢谢你们啦，有帮助的话，点个赞呀</h5><p>题外话：希望小伙伴们都别用于非法的手段，本文只是技术交流</p>
+<p><strong>谢谢大家</strong></p>
+<p>相关文献参考：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/qq_38449518/article/details/82414069?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1" target="_blank" rel="noopener">META-INF目录是干啥用的？</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>安卓逆向</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【Python】getattr和setattr的源码分析及使用</title>
+    <url>/2020/05/04/get-and-set-attr/</url>
+    <content><![CDATA[<h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><p><strong>鄙人有次在使用<code>SQLALchemy</code>的时候，对查询出来的对象，进行获取/重新赋值产生了点小问题</strong></p><p><strong>下面来一起看看这个小问题：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sqlalchemy.orm <span class="keyword">import</span> sessionmaker</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.ext.declarative <span class="keyword">import</span> declarative_base</span><br><span class="line"><span class="keyword">from</span> sqlalchemy.dialects.mysql <span class="keyword">import</span> TINYINT, INTEGER, VARCHAR, TEXT, DATE, DATETIME</span><br><span class="line"><span class="keyword">from</span> sqlalchemy <span class="keyword">import</span> create_engine, Column</span><br><span class="line"></span><br><span class="line">uri = <span class="string">"mysql+pymysql://root:@127.0.0.1:3306/test?charset=utf8mb4"</span></span><br><span class="line">Base = declarative_base()</span><br><span class="line">engine = create_engine(uri, pool_pre_ping=<span class="literal">True</span>, echo=<span class="literal">True</span>)</span><br><span class="line">Session = sessionmaker(bind=engine)</span><br><span class="line">Base = declarative_base()</span><br><span class="line">session = Session()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(Base)</span>:</span></span><br><span class="line">    __tablename__ = <span class="string">"tStudent"</span></span><br><span class="line">    id = Column(INTEGER, autoincrement=<span class="literal">True</span>, primary_key=<span class="literal">True</span>)</span><br><span class="line">    nValid = Column(INTEGER, comment=<span class="string">"1-有效；2- 无效"</span>, nullable=<span class="literal">False</span>, default=<span class="number">1</span>)</span><br><span class="line">    sName = Column(VARCHAR(<span class="number">100</span>), comment=<span class="string">"学生姓名"</span>, nullable=<span class="literal">False</span>)</span><br><span class="line">    nAge = Column(INTEGER, comment=<span class="string">"年龄"</span>)</span><br><span class="line">    sCnDesc = Column(TEXT)</span><br><span class="line">    sEnDesc = Column(TEXT)</span><br><span class="line">    </span><br><span class="line">student_a = Student()</span><br><span class="line">student_a.id = <span class="number">23</span></span><br><span class="line">student_a.nValid = <span class="number">1</span></span><br><span class="line">student_a.sName = <span class="string">"James"</span></span><br><span class="line">student_a.nAge = <span class="number">35</span></span><br><span class="line">student_a.sCnDesc = <span class="string">"大家好，我叫詹姆斯！"</span></span><br><span class="line">student_a.sEnDesc = <span class="string">"Hello everyone, My name is James!"</span></span><br><span class="line"></span><br><span class="line">session.add(student)</span><br><span class="line">session.commit()</span><br></pre></td></tr></table></figure></p><a id="more"></a>
+
+<p>鄙人开发中遇到一个这样的使用：<br>当我通过<code>sqlalchemy</code>查询数据，而且是使用<code>.all()</code>来查询的时候，<br>返回的是一个<code>list</code>，且里面的每一个元素都是一个<code>Object</code>;</p>
+<p>而此时我想要<strong>预先设置好一个list/set</strong>来存这些字段，<br>然后获取的时候<strong>通过遍历来获取</strong>，心里想：这样不就是解决我的问题了吗，这能有多难？</p>
+<p>然后操作就是这样写：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">res = session.query(Student).all()</span><br><span class="line"><span class="comment"># 比如，要获取属性id、sName、nAge：</span></span><br><span class="line">keys = [<span class="string">"id"</span>, <span class="string">"sName"</span>, <span class="string">"nAge"</span>]</span><br><span class="line"><span class="keyword">for</span> one <span class="keyword">in</span> res:</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> keys:</span><br><span class="line">        print(<span class="string">f"属性:<span class="subst">&#123;k&#125;</span> 对应的值为:<span class="subst">&#123;one.k&#125;</span>"</span>)</span><br></pre></td></tr></table></figure><br><strong>现在请你们来猜测一下这个使用对不对？或者输出结果是什么？你们先想一下结果再往下看…</strong></p>
+<p>此时运行将会得到下面的错误，是不是很惊喜？嗯哼？啥玩意啊？<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"E:/projects/python/daily/temp.py"</span>, line <span class="number">208</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    print(<span class="string">f"属性:<span class="subst">&#123;k&#125;</span> 对应的值为:<span class="subst">&#123;one.k&#125;</span>"</span>)</span><br><span class="line">AttributeError: <span class="string">'Student'</span> object has no attribute <span class="string">'k'</span></span><br></pre></td></tr></table></figure><br>看了一下，没有属性 <code>k</code>，这student对象的确没有属性 <code>k</code>啊，我的天，那我得怎么用？</p>
+<p>然后这时候如果你使用 <code>getattr</code>的话，这就很容易解决你这种需求，下面来分析一下源码：<br>这两个作为Python的内置属性，下面来分析一下源码：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getattr</span><span class="params">(object, name, default=None)</span>:</span> <span class="comment"># known special case of getattr</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    getattr(object, name[, default]) -&gt; value</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Get a named attribute from an object; getattr(x, 'y') is equivalent to x.y.</span></span><br><span class="line"><span class="string">    When a default argument is given, it is returned when the attribute doesn't</span></span><br><span class="line"><span class="string">    exist; without it, an exception is raised in that case.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">setattr</span><span class="params">(x, y, v)</span>:</span> <span class="comment"># real signature unknown; restored from __doc__</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Sets the named attribute on the given object to the specified value.</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    setattr(x, 'y', v) is equivalent to ``x.y = v''</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
+<p>从上面的源码可以分析出来 <code>getattr</code>就是从一个对象从获取你想要的属性，使用格式是：</p>
+<ul>
+<li>[x] <code>getattr(对象, 你要获取的属性)</code></li>
+</ul>
+<p>那么我这个例子里面的用法就是：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">res = session.query(Student).all()</span><br><span class="line"><span class="comment"># 比如，要获取属性id、sName、nAge：</span></span><br><span class="line">keys = [<span class="string">"id"</span>, <span class="string">"sName"</span>, <span class="string">"nAge"</span>]</span><br><span class="line"><span class="keyword">for</span> one <span class="keyword">in</span> res:</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> keys:</span><br><span class="line">        <span class="comment"># one.k 改为 getattr(one, k) 即可获取对应的属性</span></span><br><span class="line">        print(<span class="string">f"属性:<span class="subst">&#123;k&#125;</span> 对应的值为:<span class="subst">&#123;getattr(one, k)&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line">	属性:id 对应的值为:<span class="number">23</span></span><br><span class="line">	属性:sName 对应的值为:James</span><br><span class="line">	属性:nAge 对应的值为:<span class="number">35</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>[x] <code>setattr</code>的使用格式是：<code>setattr(对象, 需要设置的属性, 设置的内容)</code><br>请看下面栗子：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">res = session.query(Student).all()</span><br><span class="line"><span class="comment"># 比如，要获取属性id、sName、nAge：</span></span><br><span class="line">keys = [<span class="string">"id"</span>, <span class="string">"sName"</span>, <span class="string">"nAge"</span>]</span><br><span class="line"><span class="keyword">for</span> one <span class="keyword">in</span> res:</span><br><span class="line">    print(<span class="string">"修改前：id:&#123;&#125; sName:&#123;&#125; nAge:&#123;&#125;"</span>.format(one.id, one.sName, one.nAge))</span><br><span class="line">    setattr(one, <span class="string">"id"</span>, <span class="number">24</span>)</span><br><span class="line">    setattr(one, <span class="string">"sName"</span>, <span class="string">"Kobe Bean Bryant"</span>)</span><br><span class="line">    setattr(one, <span class="string">"nAge"</span>, <span class="number">42</span>)</span><br><span class="line">    session.commit()</span><br><span class="line">    print(<span class="string">"修改后：id:&#123;&#125; sName:&#123;&#125; nAge:&#123;&#125;"</span>.format(one.id, one.sName, one.nAge))</span><br><span class="line">    <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line">	修改前：id:<span class="number">23</span> sName:James nAge:<span class="number">35</span></span><br><span class="line">	修改后：id:<span class="number">24</span> sName:Kobe Bean Bryant nAge:<span class="number">42</span></span><br></pre></td></tr></table></figure>
+<p>可以再次通过上面的<code>getattr</code>使用来查询一遍数据库，即可验证刚刚的用法对不对</p>
+<p>==同时，官方还指出：<code>setattr(x, &#39;y&#39;, v)</code>是等价于<code>x.y = v</code>，笔者通过分析，这个用法其实也可以对这个<code>x</code>对象进行添加另外一个新的属性<code>y</code>==</p>
+<p>下面这个例子是给对象增加一个<code>school</code>属性：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">setattr(student_a, <span class="string">"school"</span>, <span class="string">"Beijing University"</span>)</span><br><span class="line">print(student_a.schole)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line">	Beijing University</span><br></pre></td></tr></table></figure>
+<p><strong>小教程有用的话，点个赞吧<br>谢谢大家，我系渣渣辉</strong></p>
+<p><strong>EOF</strong></p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【最全】JS获取浏览器属性信息</title>
+    <url>/2020/05/04/webdriver-attribute/</url>
+    <content><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>当一个爬虫工程师遇到逆向的时候，如果你使用的 selenuim 或者 pyppeteer 的时候，你是否考虑过，对浏览器的特征进行检查，这样你才能过得了设防。</p><a id="more"></a>
+<h6 id="总之，个人觉得还不错，这些属性值检查还挺全的，所以就收藏起来了，别说了-Just-do-IT-，燥起来吧"><a href="#总之，个人觉得还不错，这些属性值检查还挺全的，所以就收藏起来了，别说了-Just-do-IT-，燥起来吧" class="headerlink" title="==总之，个人觉得还不错，这些属性值检查还挺全的，所以就收藏起来了，别说了 Just do IT ，燥起来吧~~~=="></a>==总之，个人觉得还不错，这些属性值检查还挺全的，所以就收藏起来了，别说了 Just do IT ，燥起来吧~~~==</h6><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;</span><br><span class="line">&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;head&gt;</span><br><span class="line">        &lt;title&gt; New Document &lt;/title&gt;</span><br><span class="line">        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0,user-scalable=no&quot;&gt;</span><br><span class="line">        &lt;meta name=&quot;Generator&quot; content=&quot;EditPlus&quot;&gt;</span><br><span class="line">        &lt;meta name=&quot;Author&quot; content=&quot;&quot;&gt;</span><br><span class="line">        &lt;meta name=&quot;Keywords&quot; content=&quot;&quot;&gt;</span><br><span class="line">        &lt;meta charset=&quot;utf-8&quot; /&gt;</span><br><span class="line">        &lt;meta name=&quot;Description&quot; content=&quot;&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;script id=clientEventHandlersJS language=javascript&gt;</span><br><span class="line">            /******************************************下为浏览器信息************************************************/</span><br><span class="line">            //获取浏览器相关信息</span><br><span class="line">            function allinfo() &#123;</span><br><span class="line">                var appName = navigator.appName; //浏览器的正式名称</span><br><span class="line">                var appVersion = navigator.appVersion; //浏览器的版本号</span><br><span class="line">                var cookieEnabled = navigator.cookieEnabled; // 返回用户浏览器是否启用了cookie</span><br><span class="line">                var cpuClass = navigator.cpuClass; //返回用户计算机的cpu的型号，通常intel芯片返回&quot;x86&quot;（火狐没有）</span><br><span class="line"></span><br><span class="line">                var mimeType = navigator.mimeTypes; // 浏览器支持的所有MIME类型的数组</span><br><span class="line">                var platform = navigator.platform; // 浏览器正在运行的操作系统平台，包括Win16(windows3.x)  </span><br><span class="line">                //   Win32(windows98,Me,NT,2000,xp),Mac68K(Macintosh 680x0)</span><br><span class="line">                //     和ＭacPPC(Macintosh PowerPC)</span><br><span class="line">                var plugins = navigator.plugins; //  安装在浏览器上的所有插件的数组</span><br><span class="line">                var userLanguage = navigator.userLanguage; // 用户在自己的操作系统上设置的语言（火狐没有）</span><br><span class="line">                var userAgent = navigator.userAgent; //包含以下属性中所有或一部分的字符串：appCodeName,appName,appVersion,language,platform</span><br><span class="line">                var systemLanguage = navigator.systemLanguage; // 用户操作系统支持的默认语言（火狐没有）</span><br><span class="line"></span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                var type = &quot;&quot;;</span><br><span class="line">                if (isIe()) &#123;</span><br><span class="line">                    type = &quot;IE浏览器&quot;;</span><br><span class="line">                &#125; else if (isFireFox()) &#123;</span><br><span class="line">                    type = &quot;火狐浏览器&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器类型：&lt;/td&gt;&lt;td&gt;&quot; + type + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line"></span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器属性信息：&lt;/td&gt;&lt;td&gt;&quot; + userAgent + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器的正式名称：&lt;/td&gt;&lt;td&gt;&quot; + appName + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器的版本号：&lt;/td&gt;&lt;td&gt;&quot; + appVersion + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器的是否启用了cookie：&lt;/td&gt;&lt;td&gt;&quot; + cookieEnabled + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;cpu等级：&lt;/td&gt;&lt;td&gt;&quot; + cpuClass + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;浏览器的MIME类型：&lt;/td&gt;&lt;td&gt;&quot; + mimeType.length + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;系统平台：&lt;/td&gt;&lt;td&gt;&quot; + platform + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;安装的插件：&lt;/td&gt;&lt;td&gt;&quot; + plugins + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;插件的数量：&lt;/td&gt;&lt;td&gt;&quot; + plugins.length + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;插件的名称：&lt;/td&gt;&lt;td&gt;&quot; + getPluginName() + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;用户设置的操作系统语言：&lt;/td&gt;&lt;td&gt;&quot; + userLanguage + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;操作系统支持的默认语言：&lt;/td&gt;&lt;td&gt;&quot; + systemLanguage + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;Director：&lt;/td&gt;&lt;td&gt;&quot; + checkePlugs(&quot;Director&quot;) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;javaEnabled：&lt;/td&gt;&lt;td&gt;&quot; + navigator.javaEnabled() + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;是否有quickTime：&lt;/td&gt;&lt;td&gt;&quot; + checkePlugs(&quot;QuickTime&quot;) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;flash插件情况：&lt;/td&gt;&lt;td&gt;&quot; + checkePlugs(&apos;Shockwave Flash&apos;) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;是否有MediaPlayer：&lt;/td&gt;&lt;td&gt;&quot; + checkePlugs(&quot;MediaPlayer&quot;) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;是否有realPlayer:&lt;/td&gt;&lt;td&gt;&quot; + checkePlugs(&quot;RealPlayer&quot;) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;屏幕分辨率高度：&lt;/td&gt;&lt;td&gt;&quot; + window.screen.height + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;屏幕分辨率宽度：&lt;/td&gt;&lt;td&gt;&quot; + window.screen.width + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;颜色质量：&lt;/td&gt;&lt;td&gt;&quot; + window.screen.colorDepth + &quot;位&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;像素：&lt;/td&gt;&lt;td&gt;&quot; + window.screen.deviceXDPI + &quot;像素/英寸&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr&gt;&lt;td&gt;字体是否平滑：&lt;/td&gt;&lt;td&gt;&quot; + window.screen.fontSmoothingEnabled + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                //info += &quot;&lt;tr&gt;&lt;td&gt;规定浏览器是否启用数据污点：&lt;/td&gt;&lt;td&gt;&quot; + navigator.taintEnabled() + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                document.getElementById(&quot;elInfo&quot;).innerHTML = info;</span><br><span class="line">                return info;</span><br><span class="line"></span><br><span class="line">                //director</span><br><span class="line"></span><br><span class="line">                var appCodeName = navigator.appCodeName; //与浏览器相关的内部代码名</span><br><span class="line">                var appMinorVersion = navigator.appMinorVersion; //辅版本号（通常应用于浏览器的补丁或服务包)</span><br><span class="line"></span><br><span class="line">                var language = navigator.language; //浏览器支持的语言 （IE没有）</span><br><span class="line"></span><br><span class="line">                var onLine = navigator.onLine; //返回浏览器是否处于在线模式（IE4以上版本）</span><br><span class="line"></span><br><span class="line">                var opsProfile = navigator.opsProfile; // 未定义   （IE、火狐没有）</span><br><span class="line"></span><br><span class="line">                var oscpu = navigator.oscpu; //浏览器正在运行的操作系统，其中可能有CPU的信息（IE没有）</span><br><span class="line"></span><br><span class="line">                var product = navigator.product; // 浏览器的产品名（IE没有）</span><br><span class="line"></span><br><span class="line">                var productSub = navigator.productSub; //关于浏览器更多信息（IE没有）</span><br><span class="line"></span><br><span class="line">                var securityPolicy = navigator.securityPolicy; // 浏览器支持的加密类型（IE没有）</span><br><span class="line"></span><br><span class="line">                var userProfile = navigator.userProfile; //  返回一个UserProfile对象，它存储用户的个人信息（火狐没有）</span><br><span class="line"></span><br><span class="line">                var vender = navigator.vender; // 浏览器厂商名称（IE、火狐没有）</span><br><span class="line"></span><br><span class="line">                var vendorSub = navigator.vendorSub; // 关于浏览器厂商更多的信息  </span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            //获取插件所有的名称</span><br><span class="line">            function getPluginName() &#123;</span><br><span class="line">                var info = &quot;&quot;;</span><br><span class="line">                var plugins = navigator.plugins;</span><br><span class="line">                if (plugins.length &gt; 0) &#123;</span><br><span class="line">                    for (i = 0; i &lt; navigator.plugins.length; i++) &#123;</span><br><span class="line">                        info += navigator.plugins[i].name + &quot;;&quot;;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line">            //检查是否安装了某插件，如果安装了返回版本号</span><br><span class="line">            function checkePlugs(pluginname) &#123;</span><br><span class="line">                var f = &quot;-&quot;</span><br><span class="line">                var plugins = navigator.plugins;</span><br><span class="line">                if (plugins.length &gt; 0) &#123;</span><br><span class="line">                    for (i = 0; i &lt; navigator.plugins.length; i++) &#123;</span><br><span class="line">                        if (navigator.plugins[i].name.indexOf(pluginname) &gt;= 0) &#123;</span><br><span class="line">                            f = navigator.plugins[i].description.split(pluginname)[1];</span><br><span class="line">                            return f;</span><br><span class="line">                            break;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line">            //判断是否IE</span><br><span class="line">            function isIe() &#123;</span><br><span class="line">                var i = navigator.userAgent.toLowerCase().indexOf(&quot;msie&quot;);</span><br><span class="line">                return i &gt;= 0;</span><br><span class="line">            &#125;</span><br><span class="line">            //判断是否firefox</span><br><span class="line">            function isFireFox() &#123;</span><br><span class="line">                var i = navigator.userAgent.toLowerCase().indexOf(&quot;firefox&quot;);</span><br><span class="line">                return i &gt;= 0;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            /******************************************以上为浏览器信息，以下为pc信息************************************************/</span><br><span class="line">            var locator = new ActiveXObject(&quot;WbemScripting.SWbemLocator&quot;);</span><br><span class="line">            var service = locator.ConnectServer(&quot;.&quot;);</span><br><span class="line"></span><br><span class="line">            function cpuInfo() &#123; //CPU 信息  </span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_Processor&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr  bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos; &gt;&lt;td width=&apos;450&apos; &gt;CPU 信息&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;CPU序列号:&quot; + p.ProcessorID + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.Caption + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;CPU编号：&quot; + p.DeviceID + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;CPU型号：&quot; + p.Name + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;CPU状态：&quot; + p.CpuStatus + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;CPU可用性：&quot; + p.Availability + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;CUP Level：&quot; + p.Level + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;主机名称：&quot; + p.SystemName + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;Processor Type：&quot; + p.ProcessorType + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function softDisk() &#123; //软盘信息 </span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_FloppyDrive&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr  bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos; &gt;&lt;td width=&apos;450&apos;&gt;软盘信息&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.Description + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.DeviceID + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.Status + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.Manufacuturer + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function RomInfo() &#123; //CD-ROM 信息 </span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_CDROMDrive&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos;&gt;&lt;td width=&apos;450&apos; &gt;CD-ROM 信息 &lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;驱动器名称：&quot; + p.Caption + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;描述：&quot; + p.Description + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;盘符：&quot; + p.Drive + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;驱动器状态：&quot; + p.Status + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;是否在使用：&quot; + p.MediaLoaded + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function keyBoardInfo() &#123; //键盘信息 </span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_Keyboard&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr  bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos;&gt;&lt;td width=&apos;450&apos;&gt;键盘信息 &lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;键盘描述：&quot; + p.Description + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;键盘名称：&quot; + p.Name + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;键盘状态：&quot; + p.Status + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function mainBoard() &#123; //主板信息 </span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_BaseBoard&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos;&gt;&lt;td width=&apos;450&apos;&gt;主板信息 &lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;主板ID：&quot; + p.SerialNumber + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;&quot; + p.HostingBoard + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;制造商：&quot; + p.Manufacturer + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;是否开启：&quot; + p.PoweredOn + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;型号：&quot; + p.Product + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr&gt;&lt;td &gt;版本：&quot; + p.Version + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function disk() &#123; //硬盘序列号 信息</span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_DiskDrive&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos; &gt;&lt;td width=&apos;450&apos;&gt;硬盘信息 &lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;硬盘序列号：&quot; + p.signature + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line">            //获取Ram信息</span><br><span class="line">            function raminfo() &#123;</span><br><span class="line">                var system = new Enumerator(service.ExecQuery(&quot;SELECT * FROM Win32_ComputerSystem&quot;)).item();</span><br><span class="line"></span><br><span class="line">                var physicMenCap = Math.ceil(system.TotalPhysicalMemory / 1024 / 1024);</span><br><span class="line">                //内存信息 </span><br><span class="line">                var memory = new Enumerator(service.ExecQuery(&quot;SELECT * FROM Win32_PhysicalMemory&quot;));</span><br><span class="line">                for (var mem = [], i = 0; !memory.atEnd(); memory.moveNext()) &#123;</span><br><span class="line">                    mem[i++] = &#123;</span><br><span class="line">                        cap: memory.item().Capacity / 1024 / 1024,</span><br><span class="line">                        speed: memory.item().Speed</span><br><span class="line">                    &#125;;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos; &gt;&lt;td width=&apos;450&apos;&gt;内存信息 &lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;内存总量：&quot; + (mem[0].cap + mem[1].cap) + &quot;M&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;可用物理内存：&quot; + physicMenCap + &quot;M&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            //获取网络连接信息</span><br><span class="line">            function ipinfo() &#123;</span><br><span class="line"></span><br><span class="line">                var properties = service.ExecQuery(&quot;SELECT * FROM Win32_NetworkAdapterConfiguration Where IPEnabled=TRUE&quot;);</span><br><span class="line">                var e = new Enumerator(properties);</span><br><span class="line">                var info = &quot;&lt;table border=1&gt;&quot;;</span><br><span class="line">                info += &quot;&lt;tr bgcolor=&apos;#CDEDED&apos; style=&apos;font-weight: bold;&apos; &gt;&lt;td width=&apos;450&apos;&gt;网络连接信息：&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                var i = 1;</span><br><span class="line">                for (; !e.atEnd(); e.moveNext()) &#123;</span><br><span class="line">                    var p = e.item();</span><br><span class="line">                    info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;MAC地址&quot; + i + &quot;：&quot; + p.MACAddress + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    info += &quot;&lt;tr style=&apos;color: red&apos;&gt;&lt;td &gt;IP地址&quot; + i + &quot;：&quot; + p.IPAddress(0) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;</span><br><span class="line">                    i++;</span><br><span class="line">                &#125;</span><br><span class="line">                info += &quot;&lt;/table&gt;&quot;;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            function pcInfo() &#123; //所有信息 </span><br><span class="line"></span><br><span class="line">                var info = cpuInfo();</span><br><span class="line">                info += disk();</span><br><span class="line">                info += raminfo();</span><br><span class="line">                info += mainBoard();</span><br><span class="line">                info += ipinfo();</span><br><span class="line">                info += keyBoardInfo();</span><br><span class="line">                info += RomInfo();</span><br><span class="line">                info += softDisk();</span><br><span class="line"></span><br><span class="line">                document.getElementById(&apos;elInfo&apos;).innerHTML = info;</span><br><span class="line">                return info;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            /******************************************以上为pc信息************************************************/</span><br><span class="line">        &lt;/script&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/head&gt;</span><br><span class="line"></span><br><span class="line">    &lt;body&gt;</span><br><span class="line"></span><br><span class="line">        &lt;INPUT id=&quot;Button1&quot; type=&quot;button&quot; value=&quot;浏览器所有信息&quot; name=&quot;Button1&quot; language=javascript onclick=&quot;allinfo()&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;INPUT id=&quot;Button1&quot; type=&quot;button&quot; value=&quot;客户端pc信息&quot; name=&quot;Button1&quot; language=javascript onclick=&quot;pcInfo()&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;div id=&quot;elInfo&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/body&gt;</span><br><span class="line"></span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>效果图如下：</p>
+<p><img src="https://img-blog.csdn.net/20160623200057106" alt="这里写图片描述"><br>其实，个人觉得用于移动端比较不错的。</p>
+<h5 id="至此本文教程转载完毕，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文教程转载完毕，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文教程转载完毕，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"></a>至此本文教程转载完毕，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</h5><h6 id="感谢认真读完这篇教程的您"><a href="#感谢认真读完这篇教程的您" class="headerlink" title="感谢认真读完这篇教程的您"></a>感谢认真读完这篇教程的您</h6><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103461851" target="_blank" rel="noopener">爬虫js解密分析:某某猫小说</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103472617" target="_blank" rel="noopener">爬虫js解密分析:某某云文学</a>;</p>
+</blockquote>
+<p>本篇文章<a href="https://blog.csdn.net/qq_16559905/article/details/51746330" target="_blank" rel="noopener">来源</a></p>
+]]></content>
+      <categories>
+        <category>反爬虫</category>
+      </categories>
+      <tags>
+        <tag>JS逆向</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>建议收藏-使用pytorch时遇到的问题汇总</title>
+    <url>/2020/05/04/pytorch-errors/</url>
+    <content><![CDATA[<ol>
+<li><p>报错<code>TypeError: unhashable type: &#39;numpy.ndarray&#39;</code><br><strong>原因</strong>：在将pytorch的longTensor转为numpy，并用于dict的key的时候，会出现这样的错误。其实程序输出已经是int了，但是还是会被认为是ndarray。<br><strong>解决</strong>：在原来的基础上加上.item()</p>
+<pre><code>classId = support_y[i].long().cpu().detach().numpy().item()
+</code></pre></li>
+</ol><a id="more"></a>
+<ol>
+<li><p>数据加载的时候遇到<code>TypeError: &#39;int&#39; object is not callable</code><br><strong>原因</strong>：数据不是Tensor类型的而是np.array或其他类型的。<br><strong>解决</strong>：</p>
+<pre><code>tensor = torch.LongTensor(data_x)
+data_x = autograd.Variable(tensor)
+tensor = torch.LongTensor(data_y)
+data_y = autograd.Variable(tensor)
+</code></pre></li>
+</ol>
+<ol>
+<li><p>数据加载的时候遇到<code>RuntimeError: DataLoader worker (pid(s) 18620, 45872) exited unexpectedly</code><br><strong>解决</strong>：loader中令<code>num_workers=0</code></p>
+</li>
+<li><p><code>RuntimeError: input.size(-1) must be equal to input_size. Expected 10, got 2000</code><br><strong>原因</strong>： 使用view时维度指定错误，LSTM(input,(h0,c0)) 指定batch_first=True​后，input就是(batch_size,seq_len,input_size)否则为input(seq_len, batch, input_size)<br><strong>解决</strong>：</p>
+<pre><code>lstm_out, self.hidden = self.lstm(
+        embeds.view(self.batch_size, 200, EMBEDDING_DIM), self.hidden) 
+</code></pre></li>
+</ol>
+<ol>
+<li><p>报错<code>AttributeError: module &#39;torch.utils.data&#39; has no attribute &#39;random_split&#39;</code>。<br><strong>原因</strong>：pytorch1.1.0版本的random_split在torch.utils.data里，而0.4.0版本的random_split在torch.utils.data.dataset里。<br><strong>解决</strong>：<code>from torch.utils.data.dataset import random_split</code>。</p>
+</li>
+<li><p>报错<code>ValueError: Sum of input lengths does not equal the length of the input dataset!</code><br><strong>原因</strong>：数据集问题。</p>
+</li>
+<li><p>报错<code>TypeError: can&#39;t convert CUDA tensor to numpy. Use Tensor.cpu() to copy the tens or to host memory first.</code><br><strong>解决</strong>：将准确率计算改为：</p>
+<pre><code>acc1 = (pred_cls1 == val_y1).cpu().sum().numpy() / pred_cls1.size()[0]
+</code></pre></li>
+</ol>
+<ol>
+<li><p>报错<code>RuntimeError: Input and hidden tensors are not at the same device, found input t ensor at cuda:1 and hidden tensor at cuda:0</code><br><strong>原因</strong>：因为使用了</p>
+<pre><code>if torch.cuda.device_count() &gt; 1:
+    print(&quot;Let&#39;s use&quot;, torch.cuda.device_count(), &quot;GPUs!&quot;)
+    model = nn.DataParallel(model)
+model.to(device)
+</code></pre></li>
+</ol>
+<pre><code>而tensor没有指定卡的ID。  
+**解决**：两种方式。  
+1）先定义一个`device = torch.device(&#39;cuda:0&#39; if torch.cuda.is_available() else &#39;cpu&#39;)`（这里面已经定义了device在卡0上“cuda:0”），然后将`model = torch.nn.DataParallel(model，devices_ids=[0, 1, 2]）`(假设有三张卡)。此后需要将tensor 也迁移到GPU上去。注意所有的tensor必须要在同一张GPU上面，即：`tensor1 = tensor1.to(device)`, `tensor2 = tensor2.to(device)`等等。**注意**：一定不能仅仅是`tensor1.to(device)`而不赋值，这样只会创建副本。  
+2）直接用tensor.cuda()的方法。即先`model = torch.nn.DataParallel(model, device_ids=[0, 1, 2])` (假设有三块卡， 卡的ID 为0， 1， 2)，然后`tensor1 = tensor1.cuda(0)`, `tensor2=tensor2.cuda(0)`等等。（我这里面把所有的tensor全放进ID 为 0 的卡里面，也可以将全部的tensor都放在ID 为1 的卡里面）  
+参考网址：[学习Pytorch过程遇到的坑（持续更新中）](https://zhuanlan.zhihu.com/p/61892329)
+</code></pre><ol>
+<li><p>报错<code>‘DataParallel’ object has no attribute ‘init_hidden’</code>。<br><strong>原因</strong>：<code>nn.DataParallel(m)</code>这句返回的已经不是原始的m了，而是一个DataParallel，原始的m保存在DataParallel的module变量里面。<br><strong>解决</strong>： 在DataParallel和to(device)之后如果需要修改model，则需要</p>
+<pre><code>if isinstance(model, nn.DataParallel):
+    model = model.module
+</code></pre></li>
+</ol>
+<ol>
+<li><p>报错<code>Assertion</code>cur_target &gt;= 0 &amp;&amp; cur_target &lt; n_classes’ failed.`。<br><strong>原因</strong>：在分类训练中经常遇到这个问题，一般来说在网络中输出的种类数和label设置的种类数量不同的时候就会出现这个错误。Pytorch有个要求，在使用CrossEntropyLoss这个函数进行验证时label必须是以0开始的。<br><strong>解决</strong>：</p>
+<p>   tags_ids = range(len(tags_set))   # 从0开始<br>   tag2id = pd.Series(tags_ids, index=tags_set)</p>
+</li>
+</ol>
+<ol>
+<li><p>报错<code>RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=&#39;cpu&#39; to map your storages to the CPU.</code><br><strong>原因</strong>：原本是GPU训练的模型要加载在CPU上。<br><strong>解决</strong>：<code>model = torch.load(model_path, map_location=&#39;cpu&#39;)</code><br>同理，如果原本4块GPU训练的，改为一块，则<code>model = torch.load(model_path, map_location=&#39;cuda:0&#39;)</code>；<br>如果是4块到两块：就把map_location改为：<code>map_location={&#39;cuda:1&#39;: &#39;cuda:0&#39;}</code>。</p>
+</li>
+<li><p>报错<code>size mismatch for word_embeddings.weight: copying a param with shape torch.Size([3403, 128]) from checkpoint, the shape in current model is torch.Size([12386, 128]).</code><br><strong>原因</strong>：加载的模型的word_embedding层参数和当前model输入的参数不匹配。<br><strong>解决</strong>：word2id、tag2id的长度要一致。</p>
+</li>
+<li><p>报错<code>RuntimeError: Expected hidden[0] size (2, 359, 256), got (2, 512, 256)</code>。<br><strong>原因</strong>：使用了DataLoader加载数据，数据集中的训练实例数不能被batch_size整除，最后一个batch的大小不等于batch_size，而hidden_layer初始化的时候用固定的batch_size初始化：<code>autograd.Variable(torch.zeros(self.num_layers * 2, self.batch_size, self.hidden_dim // 2))</code><br><strong>解决</strong>：如果模型不能处理批量大小的在线更改，就应在torch.utils.data中设置drop_last=True，因此，在培训期间只处理整批数据。即<code>testset_loader = DataLoader(test_db, batch_size=args.batch_size, shuffle=False, num_workers=1, pin_memory=True,drop_last=True)</code></p>
+</li>
+<li><p>在pytorch训练过程中出现loss=nan的情况。<br><strong>原因</strong>：<br>1.学习率太高。学习率比较大的时候，参数可能over shoot了，结果就是找不到极小值点；<br>减小学习率可以让参数朝着极值点前进<br>。2.loss函数有问题。<br>3.对于回归问题，可能出现了除0 的计算，加一个很小的余项可能可以解决。<br>4.数据本身，是否存在Nan，可以用numpy.any(numpy.isnan(x))检查一下input和target。<br>5.target本身应该是能够被loss函数计算的，比如sigmoid激活函数的target应该大于0，同样的需要检查数据集。<br><strong>解决</strong>：减小学习速率或者增大batch_size。</p>
+</li>
+<li><p>报错<code>RuntimeError: Trying to backward through the graph second time, but the buffers have already been freed. Please specify retain_variables=True when calling backward for the first time.</code><br><strong>原因</strong>：网络中存在多个sub-network，有2个甚至2个以上的loss需要分别对网络参数进行更新，比如两个需要分别执行loss1.backward() loss2.backward()。两个loss可能会有共同的部分，所以在执行第一次loss1.backward()完成之后，Pytorch会自动释放保存着的计算图，所以执行第二次loss2.backward()的时候就会出现计算图丢失的情况。<br><strong>解决</strong>：<br>1 执行<code>loss.backward(retain_graph=True)</code>保留计算图，但这样很可能会出现内存溢出(CUDA out of memory)的情况。因为Pytorch的机制是每次调用.backward()都会free掉所有buffers，所以它提示，让retain_graph。然而当retain后，buffers就不会被free了，所以会OOM。参考网址：<a href="https://blog.csdn.net/Mundane\_World/article/details/81038274" target="_blank" rel="noopener">https://blog.csdn.net/Mundane\_World/article/details/81038274</a><br>2 当不需要计算生成器的梯度，因此在使用生成数据计算辨别器时使用<code>.detach()</code>作为输入数据，这样就对当前图进行拆分，返回一个新的从当前图中分离的 Variable，返回的 Variable 永远不会需要梯度.参考网址：<a href="https://blog.csdn.net/u011276025/article/details/76997425" target="_blank" rel="noopener">https://blog.csdn.net/u011276025/article/details/76997425</a><br>3 对于我的代码，如果retain_graph=True则内存溢出，又找不到需要.detach()的地方，最后发现是因为我的model每次训练的时候没有重新初始化隐藏层。需要在<code>model.zero_grad()</code>之后<code>model.hidden = model.init_hidden()</code>来清空 LSTM 的隐状态，将其从上个实例的历史中分离出来，避免受之前运行代码的干扰。如果不重新初始化，会有报错。</p>
+</li>
+</ol>
+<blockquote>
+<p>参考文献：<a href="https://blog.csdn.net/vivian_ll/article/details/97001895" target="_blank" rel="noopener">点击我进行查看原文</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>深度学习</category>
+      </categories>
+      <tags>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【最便捷方法】pandas-处理缺失值</title>
+    <url>/2020/05/04/pandas-handle-nan/</url>
+    <content><![CDATA[<h5 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h5><blockquote>
+<p>最近看到一些教程关于“pandas读取数据之后，如何处理缺失值或者如何替换指定值为另外一个值”</p>
+</blockquote><p>看了那些教程，然后进行了一会实操，发现不能满足我的需求，于是开始探索另外的解决办法</p><a id="more"></a>
+
+<p>下面来看一下解决方案</p>
+<h5 id="0x01、不设置默认加载空值为NAN-keep-default-na-False"><a href="#0x01、不设置默认加载空值为NAN-keep-default-na-False" class="headerlink" title="0x01、不设置默认加载空值为NAN keep_default_na=False"></a>0x01、不设置默认加载空值为NAN <code>keep_default_na=False</code></h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">df = pandas.read_excel(&quot;/home/project/day320/test.xlsx&quot;, keep_default_na=False)</span><br></pre></td></tr></table></figure>
+<p>注释：pandas加载Excel表格，空值都是默认为 NAN，即源码中<code>keep_default_na=True</code><br>所以当我们想要空值就是空值的话，那么可以设置 <code>keep_default_na=False</code>，这时候，读取出来的空值是空字符串</p>
+<blockquote>
+<p>可是，我的Excel表格之前就是存在很多 NA 值的，这不能满足我的需求，我其实是想将 NA 值再还原回原来的空字符串，所以请继续看后面的方法</p>
+</blockquote>
+<h5 id="0x02、用dropna-、fillna-处理缺失值"><a href="#0x02、用dropna-、fillna-处理缺失值" class="headerlink" title="0x02、用dropna()、fillna()处理缺失值"></a>0x02、用dropna()、fillna()处理缺失值</h5><p>存在下面的使用方法：</p>
+<ul>
+<li><p>dropna：根据标签的值中是否存在缺失数据，然后对轴标签进行过滤，可以通过阈值来调节对缺失值的删除的容忍度</p>
+</li>
+<li><p>fillna：用指定值或者插值方法(如ffill或者bfill)填充缺失数据</p>
+</li>
+<li><p>isnull：用于判断单元格是否为空值；若为空值，则返回True</p>
+</li>
+<li>notnull：isnull的对立</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">删除空值：</span><br><span class="line">df.dropna() # 默认会删除所有的空值，包含所有行里面的、所有列里面的空值</span><br><span class="line"></span><br><span class="line">df.dropna(how=&quot;all&quot;) # 删除全为 NA 的行(即如果一整行的单元格都是NA的话，那么则删除这一行)</span><br><span class="line"></span><br><span class="line">df.dropna(axis=1, how=&quot;all&quot;) # 删除全为 NA 的列(即如果一整列的单元格都是NA的话，那么则删除这一列)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">判断空值：</span><br><span class="line">df.isnull() # 对应的返回布尔值，查看是否为空的数据</span><br><span class="line">df.notnull() # 与上一条相反</span><br><span class="line"></span><br><span class="line">填充缺失值：</span><br><span class="line">df.fillna(value=2, inplace=True) # 对缺失的NAN值全部替换为 0</span><br><span class="line"></span><br><span class="line">df.fillna(value=2, method=&quot;ffill&quot;, limit=2) </span><br><span class="line">- method：表示插值方式，默认为ffill，对这个字段更多详解请参考官网文档</span><br><span class="line">- limit：表示可以连续填充的最大次数(对于前向和后向填充)</span><br><span class="line">- value：需要填充的值，可以为标量(字符串、数值等)或者字典对象</span><br><span class="line">- inspace：表示是否在原来的对象上进行修改而不产生新的对象，true：在原基础上修改；false：会返回处理后的，新的对象</span><br></pre></td></tr></table></figure>
+<h4 id="前方高能，巨坑提示-如果你的数据中其实看起来就是空值的，但是这时候有可能为-空白的字符串-那么，你使用fillna或者dropna是不会生效的！！！！"><a href="#前方高能，巨坑提示-如果你的数据中其实看起来就是空值的，但是这时候有可能为-空白的字符串-那么，你使用fillna或者dropna是不会生效的！！！！" class="headerlink" title="==前方高能，巨坑提示==如果你的数据中其实看起来就是空值的，但是这时候有可能为 空白的字符串 那么，你使用fillna或者dropna是不会生效的！！！！"></a>==前方高能，巨坑提示==如果你的数据中其实看起来就是空值的，但是这时候有可能为 <em>空白的字符串</em> 那么，你使用<code>fillna</code>或者<code>dropna</code>是不会生效的！！！！</h4><p>小结：对于一些不确定的，或者不一定为空的内容，还是不能直接使用这两个<code>dropna</code>、<code>fillna</code>这两个来处理缺失值。<br>相关参考fillna和inplace使用文章，<a href="https://www.jianshu.com/p/b5bb71aa7466" target="_blank" rel="noopener">请点击我进行了解</a></p>
+<h5 id="0x03、使用强大的replace来填充任何值的数据"><a href="#0x03、使用强大的replace来填充任何值的数据" class="headerlink" title="0x03、使用强大的replace来填充任何值的数据"></a>0x03、使用强大的<code>replace</code>来填充任何值的数据</h5><p>pandas提供了一个replace方法，并且这个方法==可以使用正则==来处理<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">df.replace(to_replace=r&quot;^NA$&quot;, value=&quot;&quot;, inplace=True, regex=True)</span><br><span class="line"></span><br><span class="line">- to_replace：被替换的字符</span><br><span class="line">- value：替换后的字符</span><br><span class="line">- inplace：是否在原基础上进行修改</span><br><span class="line">- regex：是否为正则表达式方式</span><br></pre></td></tr></table></figure></p>
+<p>由于我的表格里面的空值都是写着NA的，所以对于我来说，使用这个方法是最好的一个实现办法</p>
+<p>如果你的空白字符可能含有空格、换行、制表符等空白字符的话，可以使用这个正则来替换：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">df.replace(to_replace=r&quot;^\s*$&quot;, value=&quot;&quot;, inplace=True, regex=True)</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <categories>
+        <category>数据处理</category>
+      </categories>
+      <tags>
+        <tag>数据处理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端边距-反爬遇到的前端知识必知</title>
+    <url>/2020/05/04/html-know/</url>
+    <content><![CDATA[<p>css字体颜色，下面是对p标签使用：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;style type=&quot;text/css&quot;&gt;</span><br><span class="line">    /*p标签样式*/</span><br><span class="line">    p &#123;</span><br><span class="line">        text-align: center; /*居中*/</span><br><span class="line">        padding-top:20px; /*距离顶部300px*/</span><br><span class="line">        font-size: 10px; /*字体大小*/</span><br><span class="line">        color: purple; /*字体颜色*/</span><br><span class="line">        font-family: SimSun  ; /*设置字体为华文彩云*/</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line">&lt;table&gt;</span><br><span class="line">    &lt;p&gt;显示中文 or not?&lt;/p&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;&lt;span class=&quot;barcode&quot;&gt;*TEST BARCODE*&lt;/span&gt;&lt;/td&gt;</span><br><span class="line">        &lt;td class=&quot;right&quot;&gt;&lt;img class=&quot;logo&quot; src=&quot;logo.png&quot; alt=&quot;logo&quot;&gt;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">&lt;/table&gt;</span><br></pre></td></tr></table></figure></p><a id="more"></a>
+<h1 id="HTML边距设置之padding和margin"><a href="#HTML边距设置之padding和margin" class="headerlink" title="HTML边距设置之padding和margin"></a>HTML边距设置之padding和margin</h1><p>在CSS中margin是指从自身边框到另一个容器边框之间的距离，就是容器外距离。在CSS中padding是指自身边框到自身内部另一个容器边框之间的距离，就是容器内距离。</p>
+<p><strong>下面讲解 padding和margin常用的用法</strong></p>
+<p><strong>一、padding</strong></p>
+<p><strong>1、语法结构</strong></p>
+<p>（1）padding-left:10px; 左内边距</p>
+<p>（2）padding-right:10px; 右内边距</p>
+<p>（3）padding-top:10px; 上内边距</p>
+<p>（4）padding-bottom:10px; 下内边距</p>
+<p>（5）padding：10px; 四边统一内边距</p>
+<p>（6）padding:10px 20px; 上下、左右内边距</p>
+<p>（7）padding:10px 20px 30px; 上、左右、下内边距</p>
+<p>（8）padding:10px 20px 30px 40px; 上、右、下、左内边距</p>
+<p><strong>2、可能取的值</strong></p>
+<p>（1）length  规定具体单位记的内边距长度</p>
+<p>（2）%       基于父元素的宽度的内边距的长度</p>
+<p>（3）auto    浏览器计算内边距</p>
+<p>（4）inherit 规定应该从父元素继承内边距</p>
+<p><strong>3、浏览器兼容问题</strong></p>
+<p>（1）所有浏览器都支持padding属性</p>
+<p>（2）任何版本IE都不支持属性值“inherit”</p>
+<p><strong>二、margin</strong></p>
+<p><strong>1、语法结构</strong></p>
+<p>（1）margin-left:10px; 左外边距</p>
+<p>（2）margin-right:10px; 右外边距</p>
+<p>（3）margin-top:10px; 上外边距</p>
+<p>（4）margin-bottom:10px; 下外边距</p>
+<p>（5）margin:10px; 四边统一外边距</p>
+<p>（6）margin:10px 20px; 上下、左右外边距</p>
+<p>（7）margin:10px 20px 30px; 上、左右、下外边距</p>
+<p>（8）margin:10px 20px 30px 40px; 上、右、下、左外边距</p>
+<p><strong>2、可能取的值</strong></p>
+<p>（1）length  规定具体单位记的外边距长度</p>
+<p>（2）%       基于父元素的宽度的外边距的长度</p>
+<p>（3）auto    浏览器计算外边距</p>
+<p>（4）inherit 规定应该从父元素继承外边距</p>
+<p><strong>3、浏览器兼容问题</strong></p>
+<p>（1）所有浏览器都支持margin属性</p>
+<p>（2）任何版本IE都不支持属性值“inherit”</p>
+<p><strong>margin和padding的区别用图表示为：</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/20200228133403926.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>参考文献 -&gt;  边距问题可以参考：<a href="https://blog.csdn.net/jimsonhappy/article/details/39534441" target="_blank" rel="noopener">HTML边距设置之padding和margin</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>反爬虫</category>
+      </categories>
+      <tags>
+        <tag>JS逆向</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>cuda相关安装(历史版本、对应驱动版本)</title>
+    <url>/2020/05/04/cuda-install/</url>
+    <content><![CDATA[<h5 id="各个历史版本-cuda-toolkit-下载链接"><a href="#各个历史版本-cuda-toolkit-下载链接" class="headerlink" title="各个历史版本 cuda toolkit 下载链接"></a>各个历史版本 cuda toolkit 下载链接</h5><p>发现cuda toolkit 8.0 _windows_7_locoal  版本的 无法下载，  但是笔记本目前是win7系统， 找了之前的7.5版本了，为了便于今后更快捷，保存下各个历史版本cuda toolkit</p><a id="more"></a>
+<p>cuda历史各个版本下载链接：<br><a href="https://developer.nvidia.com/cuda-toolkit-archive" target="_blank" rel="noopener">https://developer.nvidia.com/cuda-toolkit-archive</a></p>
+<h5 id="相关的cudnn历史版本："><a href="#相关的cudnn历史版本：" class="headerlink" title="相关的cudnn历史版本："></a>相关的cudnn历史版本：</h5><p><a href="https://developer.nvidia.com/rdp/cudnn-archive" target="_blank" rel="noopener">https://developer.nvidia.com/rdp/cudnn-archive</a></p>
+<p>cuda版本和驱动版本对应<br><img src="https://img-blog.csdnimg.cn/20200228133211771.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<blockquote>
+<p><a href="https://blog.csdn.net/qing101hua/article/details/74457109" target="_blank" rel="noopener">参考</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>深度学习</category>
+      </categories>
+      <tags>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Scrapy少写yield坑</title>
+    <url>/2020/05/04/scrapy-yield/</url>
+    <content><![CDATA[<h4 id="当你重写start-requests方法的时候，使用scrapy-Request-xxx-后记得前面一定要加上yield，不然报错说是NoneType不是一个可迭代对象"><a href="#当你重写start-requests方法的时候，使用scrapy-Request-xxx-后记得前面一定要加上yield，不然报错说是NoneType不是一个可迭代对象" class="headerlink" title="当你重写start_requests方法的时候，使用scrapy.Request(xxx)后记得前面一定要加上yield，不然报错说是NoneType不是一个可迭代对象"></a>当你重写<code>start_requests</code>方法的时候，使用<code>scrapy.Request(xxx)</code>后记得前面一定要加上<code>yield</code>，不然报错说是<code>NoneType</code>不是一个可迭代对象</h4><a id="more"></a><p><strong>1.报错信息:</strong><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;E:\apps\anaconda3\lib\site-packages\twisted\internet\defer.py&quot;, line 1418, in _inlineCallbacks</span><br><span class="line">    result = g.send(result)</span><br><span class="line">  File &quot;E:\apps\anaconda3\lib\site-packages\scrapy\crawler.py&quot;, line 87, in crawl</span><br><span class="line">    start_requests = iter(self.spider.start_requests())</span><br><span class="line">TypeError: &apos;NoneType&apos; object is not iterable</span><br><span class="line">2020-02-27 14:20:59 [twisted] CRITICAL: </span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;E:\apps\anaconda3\lib\site-packages\twisted\internet\defer.py&quot;, line 1418, in _inlineCallbacks</span><br><span class="line">    result = g.send(result)</span><br><span class="line">  File &quot;E:\apps\anaconda3\lib\site-packages\scrapy\crawler.py&quot;, line 87, in crawl</span><br><span class="line">    start_requests = iter(self.spider.start_requests())</span><br><span class="line">TypeError: &apos;NoneType&apos; object is not iterable</span><br></pre></td></tr></table></figure></p>
+<p><strong>2.正确使用：</strong><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># start_urls = [&apos;http://xxx/xxx/&apos;]</span><br><span class="line"></span><br><span class="line">base_url = &quot;http://xxx/xxx/&#123;&#125;?page=&#123;&#125;&quot;</span><br><span class="line">key_worlds = [xxx, xxx, xxx]</span><br><span class="line"></span><br><span class="line">def start_requests(self):</span><br><span class="line">    for k in self.key_worlds:</span><br><span class="line">        yield scrapy.Request(</span><br><span class="line">            url=self.base_url.format(k, 1),</span><br><span class="line">            meta=&#123;&quot;key&quot;: k&#125;,</span><br><span class="line">            callback=self.parse,</span><br><span class="line">        )</span><br></pre></td></tr></table></figure></p>
+<p><strong>3.错误使用：</strong><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># start_urls = [&apos;http://xxx/xxx/&apos;]</span><br><span class="line"></span><br><span class="line">base_url = &quot;http://xxx/xxx/&#123;&#125;?page=&#123;&#125;&quot;</span><br><span class="line">key_worlds = [xxx, xxx, xxx]</span><br><span class="line"></span><br><span class="line">def start_requests(self):</span><br><span class="line">    for k in self.key_worlds:</span><br><span class="line">        scrapy.Request(</span><br><span class="line">            url=self.base_url.format(k, 1),</span><br><span class="line">            meta=&#123;&quot;key&quot;: k&#125;,</span><br><span class="line">            callback=self.parse,</span><br><span class="line">        )</span><br></pre></td></tr></table></figure></p>
+<p>鄙人粗心大意，就一个<code>yield</code>之差，排查了十几二十分钟。。。。</p>
+<h4 id="数学老师常教我们-等效替换"><a href="#数学老师常教我们-等效替换" class="headerlink" title="数学老师常教我们==等效替换=="></a>数学老师常教我们==等效替换==</h4><ul>
+<li><p>在这里我们也可以。可以使用列表推导式来代替这个；</p>
+</li>
+<li><p>反正都是建立一系列的初始化请求，然后放到队列里面自动去请求，然后执行调用指定的回调函数，没有指定的话，默认是回调<code>self.parse</code>函数，下面来等价的将上面的代码换一下：</p>
+</li>
+</ul>
+<p>描述：如果你细心的话，你可以注意到我刚刚前面给的代码，有注释一行<code># start_urls = [&#39;http://xxx/xxx/&#39;]</code></p>
+<h5 id="刚刚上面的代码可以使用下面的代码来替换，是不是很简单？？？"><a href="#刚刚上面的代码可以使用下面的代码来替换，是不是很简单？？？" class="headerlink" title="刚刚上面的代码可以使用下面的代码来替换，是不是很简单？？？"></a>刚刚上面的代码可以使用下面的代码来替换，是不是很简单？？？</h5><p>(PS:但是有一点不一样的就是，meta信息没有传递过去，但这里你可以通过url那个关键词来获取，也是可以滴)<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">base_url = &quot;http://xxx/xxx/&#123;&#125;?page=&#123;&#125;&quot;</span><br><span class="line">key_worlds = [xxx, xxx, xxx]</span><br><span class="line"></span><br><span class="line">start_urls = [base_url.format(k, 1) for k in key_worlds]</span><br></pre></td></tr></table></figure></p>
+<h5 id="至此本文踩坑记录写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文踩坑记录写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文踩坑记录写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"></a>至此本文踩坑记录写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</h5><h5 id="感谢认真读完这篇教程的您"><a href="#感谢认真读完这篇教程的您" class="headerlink" title="感谢认真读完这篇教程的您"></a>感谢认真读完这篇教程的您</h5><p>先别走呗，这里有可能有你需要的文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>；<br><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103461851" target="_blank" rel="noopener">爬虫js解密分析:某某猫小说</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103472617" target="_blank" rel="noopener">爬虫js解密分析:某某云文学</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103474801" target="_blank" rel="noopener">个人总结-js逆向解析思路</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会(ttf字体同理)</a>;</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>反爬虫</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>爬虫js解密分析:某某猫小说</title>
+    <url>/2020/05/04/js_ciweimao/</url>
+    <content><![CDATA[<h5 id="前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。"><a href="#前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。" class="headerlink" title="前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。"></a>前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。</h5><h5 id="本次来学习一下简单的js逆向教程"><a href="#本次来学习一下简单的js逆向教程" class="headerlink" title="本次来学习一下简单的js逆向教程"></a>本次来学习一下简单的js逆向教程</h5><a id="more"></a><p>为了不直接贴出网站链接，下面是已经经过某种常见的、可逆的加密方式进行加密<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">##### 0x01、查看接口返回的数据</span><br><span class="line">![在这里插入图片描述](https://img-blog.csdnimg.cn/20191209173206462.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70)</span><br><span class="line"></span><br><span class="line">看到接口返回的数据有点可疑，看到这种```chapter_access_key```字眼,顾名思义就是章节访问key，先记着有这么一个字眼先，继续观察</span><br><span class="line"></span><br><span class="line">![在这里插入图片描述](https://img-blog.csdnimg.cn/20191209173232914.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70)</span><br><span class="line">这次又来一个字眼：encrypt，而且数据是加密的，联想上一步，进而得知，可能是：拿chapter_access_key去解密当前的加密数据</span><br><span class="line"></span><br><span class="line">##### 0x02、全局搜索```encryt_keys</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20191209173249474.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>这就搜索到两处<code>encryt_keys</code><br>点进去看看呗</p>
+<blockquote>
+<p>发现两处的地方还是有点不一样，但是怎么区分这个呢？</p>
+</blockquote>
+<p>到这里，你是否还记得上一步的截图当中出现过的接口和当前截图里面有点一样呢？</p>
+<p>给你再看清楚一下呗：<br><img src="https://img-blog.csdnimg.cn/20191209173321911.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>那么解决思路就来了：先看这个函数，看看debug出什么来；不行的话，再看另外那个函数</p>
+<p>打上断点，重新加载，调试发现最终的解密函数入口是：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">myDecrypt: function(f) &#123;</span><br><span class="line">            var g = new b([]);</span><br><span class="line">            return g.decrypt(f)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">// 再具体一点就是函数：g.decrypt(f)</span><br><span class="line">// 即是下面这个函数：</span><br><span class="line">decrypt: function(g) &#123;</span><br><span class="line">           巴拉巴拉</span><br><span class="line">           巴拉巴拉</span><br><span class="line">           #￥%@！~%……&amp;*（）&amp;</span><br><span class="line">           #￥%@！~%……&amp;*（）&amp;</span><br><span class="line">           .</span><br><span class="line">           .</span><br><span class="line">           .</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="0x03、找到了，那扣它啊！"><a href="#0x03、找到了，那扣它啊！" class="headerlink" title="0x03、找到了，那扣它啊！"></a>0x03、找到了，那扣它啊！</h5><p>通过将<code>myDecrypt: function(f)</code>扣出来之后，进行本地调试，然后就是缺啥补啥</p>
+<p>ps: 懵懂的我一开始还不知道缺啥补啥是怎么解决，直到问了一些大佬才知道就是：如果不知道怎么解决的话，那就跟着浏览器，然后debug，一步一步看，看它调用了哪些变量/常量/函数！</p>
+<p>如果还是不知道怎么看的话，就是将鼠标放在正在变量/函数那里，它会显示蓝色的调用栈，然后点击进去看它，即可得到解决思路。<br>需要导入：<code>CryptoJS</code><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var CryptoJS = require(&quot;C:/Users/Administrator/AppData/Roaming/npm/node_modules/crypto-js&quot;);</span><br><span class="line">// var CryptoJS = require(&quot;crypto-js&quot;);  // 运行报错 Error: Cannot find module &apos;crypto-js&apos;,因此需要指定路径进行导入这个依赖</span><br><span class="line">// console.log(module.paths);  // 上面的报错信息可以使用这个来查看导入的模块路径有哪些</span><br><span class="line">// 然后查看安装路径：</span><br><span class="line">// $ npm prefix -g   # node安装路径</span><br><span class="line">// /Users/xxx/.nvm/versions/node/v10.16.0</span><br><span class="line">// $ npm -g root  # 查看依赖安装路径</span><br><span class="line">// /Users/xxx/.nvm/versions/node/v10.16.0/lib/node_modules  // 然后将这里的路径复制到上面导入的路径处</span><br></pre></td></tr></table></figure></p>
+<h5 id="0x04、踩坑的过程痛苦并快乐着"><a href="#0x04、踩坑的过程痛苦并快乐着" class="headerlink" title="0x04、踩坑的过程痛苦并快乐着"></a>0x04、踩坑的过程痛苦并快乐着</h5><p>-[x] 已掉坑：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">n = d.base64.decode(n);</span><br><span class="line">^</span><br><span class="line">ReferenceError: d is not defined</span><br></pre></td></tr></table></figure><br>调试的时候，看到这个未定义，以为看到base64就是转换为nodejs里面的base64的对应使用就可以了，发现最后没报错但也没有结果！！！</p>
+<p>你知道这是很可怕的事情吗，一个没有bug的程序，而且得出的结果不是预期的<br>鄙人还是太菜了，我哭了，你呢？</p>
+<p>然后反复在浏览器进行debug，一个个排除，最终将问题定位到：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">n = d.base64.decode(n);</span><br></pre></td></tr></table></figure></p>
+<p>定位到这一行代码的时候，我进去看看这个decode/encode，发现并不是通过转换为nodejs的base64的decode/encode，<br>这是网址自己封装的加解密方式啊！！！<br>跪了跪了 ○|￣|_</p>
+<p>跪完还得继续干啊，兄嘚，继续扣相关的js呗！！！</p>
+<h5 id="0x05、扣完这些js之后，舒服啊，解密完毕"><a href="#0x05、扣完这些js之后，舒服啊，解密完毕" class="headerlink" title="0x05、扣完这些js之后，舒服啊，解密完毕"></a>0x05、扣完这些js之后，舒服啊，解密完毕</h5><p>看一下解密的最终函数代码粗略截图：<br><img src="https://img-blog.csdnimg.cn/20191209173343159.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>运行结果截图:<br><img src="https://img-blog.csdnimg.cn/20191209173354119.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h5 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h5><p>本次收获到了调试技巧、及大概悉知网站存在偷换的概念/执行方式的可能</p>
+<blockquote>
+<p>点击我进行了解<a href="https://mp.weixin.qq.com/s/STAWu31fQakOgROfCs-4-g" target="_blank" rel="noopener">引用来源</a> </p>
+</blockquote>
+<h5 id="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"></a>至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</h5><h6 id="感谢认真读完这篇教程的您"><a href="#感谢认真读完这篇教程的您" class="headerlink" title="感谢认真读完这篇教程的您"></a>感谢认真读完这篇教程的您</h6><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103474801" target="_blank" rel="noopener">个人总结-js逆向解析思路</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103472617" target="_blank" rel="noopener">爬虫js解密分析:某某云文学</a>;</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>反爬虫</category>
+      </categories>
+      <tags>
+        <tag>JS逆向</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>爬虫js解密分析:某某云文学</title>
+    <url>/2020/05/04/js_aliyun_literature/</url>
+    <content><![CDATA[<h5 id="前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。"><a href="#前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。" class="headerlink" title="前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。"></a>前言：本教程仅供学习，不得非法破坏网站。如用于其他暴力等用途，后果自负。如侵权您的网站请留言我，我立刻删除，感谢。</h5><h5 id="这估计是最简单的js解密教程了"><a href="#这估计是最简单的js解密教程了" class="headerlink" title="这估计是最简单的js解密教程了"></a>这估计是最简单的js解密教程了</h5><a id="more"></a><p>为了不直接贴出网站链接，下面是已经经过某种常见的、可逆的加密方式进行加密<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">##### 0x01、查看接口返回的数据</span><br><span class="line">![aliwx_api_content](https://img-blog.csdnimg.cn/20191210112627914.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70)</span><br><span class="line">看到返回的数据是加密类型的，这回估计是不知道怎么下手？</span><br><span class="line">不如又来试试，直接搜索字段```ChepterContent````呗</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">##### 0x02、全局搜索```ChapterContent</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://img-blog.csdnimg.cn/20191210112649511.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="aliwx_ChapterContent.png"><br>看到搜索出来的结果只有一个js文件存在，点进去看看呗<br>对这个js文件点击格式化按钮，让它格式化之后显得好看，再搜索一次<br>【alwx_decode.png】</p>
+<p>直接看到了<code>decodeCont</code>这个函数,顾名思义就是解密内容，大胆假设就是它！打上断点debug看看</p>
+<p>PS：这里来介绍一下debug的快捷看结果的方式：<br>打断点技巧：<br><img src="https://img-blog.csdnimg.cn/20191210112708521.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="alwx_duandian.png"></p>
+<p>快速查看返回结果技巧：<br><img src="https://img-blog.csdnimg.cn/20191210112721807.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="alwx_debug_jiqiao.png"></p>
+<p>查看结果如下：<br><img src="https://img-blog.csdnimg.cn/20191210112734499.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="alwx_debug_js_code.png"></p>
+<p>经过一两分钟debug就是发现解密就是这个函数了！！盘它！！</p>
+<h5 id="0x03、扣完这些js之后，舒服啊，解密完毕，啥都不缺系列的js函数"><a href="#0x03、扣完这些js之后，舒服啊，解密完毕，啥都不缺系列的js函数" class="headerlink" title="0x03、扣完这些js之后，舒服啊，解密完毕，啥都不缺系列的js函数"></a>0x03、扣完这些js之后，舒服啊，解密完毕，啥都不缺系列的js函数</h5><p>看一下解密的最终函数代码粗略截图：<br><img src="https://img-blog.csdnimg.cn/2019121011283691.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="alwx_debug_decode.png"></p>
+<p>运行结果截图:<br><img src="https://img-blog.csdnimg.cn/20191210112848162.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTE3MzM3NA==,size_16,color_FFFFFF,t_70" alt="alwx_decode_result.png"></p>
+<h5 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h5><p>解密前，我以为是很的。没想到惊了我，阿里这么偌大的公司，竟然不给爬虫工程师搞点难度？(其实内心是欢喜的，嘻嘻~~)<br>本次教程比上一篇还简单<a href="https://blog.csdn.net/weixin_41173374/article/details/103461851" target="_blank" rel="noopener">爬虫js解密分析:某某猫小说</a></p>
+<p>难度大的网站，hook出来的个个都是大神，公开会喜获一副银手镯，所以解密难度大的网站是不可能的，这辈子都不可能的。唯有扣扣简单的网站，才能维持生活。<br>谢谢大扎，我系渣渣辉</p>
+<h5 id="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"><a href="#至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗" class="headerlink" title="至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗"></a>至此本文教程写完了，希望能够帮助到各位在爬虫路上的小伙伴们，觉得不错点个赞呗</h5><h6 id="感谢认真读完这篇教程的您"><a href="#感谢认真读完这篇教程的您" class="headerlink" title="感谢认真读完这篇教程的您"></a>感谢认真读完这篇教程的您</h6><p>先别走呗，这里有可能有你需要的干货文章：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_41173374/article/details/99212145" target="_blank" rel="noopener">爬虫：js逆向目前遇到的知识点集合</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100053060" target="_blank" rel="noopener">CSS字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/100013167" target="_blank" rel="noopener">woff字体反爬实战，10分钟就能学会</a>;<br><a href="https://blog.csdn.net/weixin_41173374/article/details/103461851" target="_blank" rel="noopener">爬虫js解密分析:某某猫小说</a>;</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>反爬虫</category>
+      </categories>
+      <tags>
+        <tag>JS逆向</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>django踩坑记录(4)</title>
     <url>/2019/11/13/django-err4/</url>
     <content><![CDATA[<h5 id="0x0d、如何设置不同登录方式，显示不同的标签及对应的form表单的字段？下面代码超级多细节，真的值得看"><a href="#0x0d、如何设置不同登录方式，显示不同的标签及对应的form表单的字段？下面代码超级多细节，真的值得看" class="headerlink" title="0x0d、如何设置不同登录方式，显示不同的标签及对应的form表单的字段？下面代码超级多细节，真的值得看"></a>0x0d、如何设置不同登录方式，显示不同的标签及对应的form表单的字段？下面代码超级多细节，真的值得看</h5><p>描述的情景如下图：<br><img src="https://note.youdao.com/yws/api/personal/file/54ED4E0E226340CEA9CFE4108A8547A0?method=download&amp;shareKey=8a38291ac6316a8d039a0d0975e34c19" alt="不同的form表单对应不同的标签"></p><p><img src="https://note.youdao.com/yws/api/personal/file/CCB8C3669E494ED18D31F06D81368E65?method=download&amp;shareKey=8d8a97dda2c2c008300b001ffe8e9d51" alt="form、及对应的标签"></p><p>代码实现思路：两个不同的登录方式是：账号密码登录和使用短信验证码登录。</p><a id="more"></a>
